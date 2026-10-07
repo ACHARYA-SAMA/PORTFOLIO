@@ -1,0 +1,556 @@
+/* ───────────────────────────────────────────────────────────
+   HERO — the machine
+   ─────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  height: 100svh;
+  min-height: 540px;
+  overflow: hidden;
+  background: var(--color-red);
+  color: var(--color-cream);
+  isolation: isolate;
+}
+
+.light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 110vmax;
+  height: 110vmax;
+  margin: -55vmax 0 0 -55vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 98, 64, 0.58) 0%,
+    rgba(255, 60, 36, 0.24) 26%,
+    rgba(255, 42, 23, 0) 58%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(130% 70% at 50% 118%, rgba(70, 0, 0, 0.62), rgba(70, 0, 0, 0) 62%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0) 58%, rgba(40, 0, 0, 0.32));
+}
+
+/* Roller-shutter slats that fade in as the panel lifts away */
+.slats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0 26px,
+    rgba(0, 0, 0, 0.16) 26px 27px,
+    rgba(255, 255, 255, 0.08) 27px 28px
+  );
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.lip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  z-index: 4;
+  background: linear-gradient(to bottom, #8f0c03, #3d0501);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.lip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 64px;
+  height: 4px;
+  margin-left: -32px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.stageWrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 88px 16px 96px;
+  perspective: 1400px;
+}
+
+.stage {
+  will-change: transform;
+}
+
+/* --h drives every dimension of the machine */
+.machine {
+  --h: clamp(40px, min(10.4vw, 13.2svh), 150px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+/* ── Plate ───────────────────────────────────────────────── */
+
+.plateWrap {
+  position: relative;
+  margin-bottom: calc(var(--h) * 0.2);
+}
+
+.plateShadow {
+  position: absolute;
+  inset: 30% 6% -18% 6%;
+  border-radius: 8px;
+  background: rgba(40, 0, 0, 0.55);
+  filter: blur(10px);
+  z-index: -1;
+}
+
+.plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--h) * 0.09);
+  padding: calc(var(--h) * 0.075) calc(var(--h) * 0.11);
+  border-radius: calc(var(--h) * 0.05);
+  background: linear-gradient(180deg, #343434 0%, #121212 46%, #030303 54%, #111 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.rivet {
+  width: calc(var(--h) * 0.06);
+  height: calc(var(--h) * 0.06);
+  min-width: 5px;
+  min-height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #9a9a9a, #2b2b2b 60%, #050505);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.plateScreen {
+  position: relative;
+  display: block;
+  padding: calc(var(--h) * 0.035) calc(var(--h) * 0.08);
+  background: #070000;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
+  perspective: 300px;
+  overflow: hidden;
+}
+
+/* LED dot grid */
+.plateScreen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 0.7px, rgba(0, 0, 0, 0.55) 1.1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+}
+
+.plateText {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: max(10px, calc(var(--h) * 0.118));
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  color: #ff4a35;
+  text-shadow: 0 0 6px rgba(255, 50, 20, 0.85), 0 0 14px rgba(255, 30, 10, 0.45);
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+
+/* ── Counter ─────────────────────────────────────────────── */
+
+.counterRow {
+  position: relative;
+}
+
+.window {
+  position: relative;
+  padding: calc(var(--h) * 0.075);
+  border-radius: calc(var(--h) * 0.07);
+  background: #060606;
+  outline: none;
+  box-shadow:
+    0 calc(var(--h) * -0.02) 0 rgba(90, 0, 0, 0.45),
+    0 calc(var(--h) * 0.022) 0 rgba(255, 150, 130, 0.38),
+    0 0 0 calc(var(--h) * 0.03) rgba(120, 6, 0, 0.6),
+    0 calc(var(--h) * 0.2) calc(var(--h) * 0.4) calc(var(--h) * -0.12) rgba(60, 0, 0, 0.65),
+    inset 0 calc(var(--h) * 0.04) calc(var(--h) * 0.08) rgba(0, 0, 0, 0.95);
+}
+
+.window:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--color-ink),
+    0 0 0 5px var(--color-signal);
+}
+
+.window > .drums {
+  --h: inherit;
+  display: flex;
+  border-radius: calc(var(--h) * 0.025);
+  overflow: hidden;
+}
+
+.glass {
+  position: absolute;
+  inset: calc(var(--h) * 0.075);
+  border-radius: calc(var(--h) * 0.025);
+  pointer-events: none;
+  background:
+    linear-gradient(168deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 26%, rgba(255, 255, 255, 0) 27%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.05));
+  box-shadow:
+    inset 0 calc(var(--h) * 0.05) calc(var(--h) * 0.1) rgba(0, 0, 0, 0.55),
+    inset 0 calc(var(--h) * -0.03) calc(var(--h) * 0.08) rgba(0, 0, 0, 0.45);
+}
+
+.screw {
+  position: absolute;
+  width: calc(var(--h) * 0.07);
+  height: calc(var(--h) * 0.07);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8b78, #b81005 55%, #5c0601);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.screw::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 50%;
+  height: 1px;
+  background: rgba(60, 0, 0, 0.8);
+  transform: rotate(-35deg);
+}
+
+.screwTL { left: calc(var(--h) * -0.2); top: calc(var(--h) * -0.12); }
+.screwTR { right: calc(var(--h) * -0.2); top: calc(var(--h) * -0.12); }
+.screwBL { left: calc(var(--h) * -0.2); bottom: calc(var(--h) * -0.12); }
+.screwBR { right: calc(var(--h) * -0.2); bottom: calc(var(--h) * -0.12); }
+
+.engrave {
+  position: absolute;
+  top: calc(100% + var(--h) * 0.14);
+  left: 0;
+  font-size: 10px;
+  color: rgba(70, 0, 0, 0.55);
+  text-shadow: 0 1px 0 rgba(255, 140, 120, 0.35);
+}
+
+.engraveRight {
+  left: auto;
+  right: 0;
+}
+
+/* The card slot hangs off the right of the window, outside the centred flow */
+.slotPos {
+  position: absolute;
+  left: calc(100% + var(--h) * 0.06);
+  top: 0;
+  height: 100%;
+}
+
+/* ── Knob ────────────────────────────────────────────────── */
+
+.knobWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: calc(var(--h) * 0.3);
+}
+
+.knob {
+  position: relative;
+  width: calc(var(--h) * 0.5);
+  height: calc(var(--h) * 0.5);
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 50%;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.knobWell {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #7b0901, #b20f05 62%, #d8160a 70%);
+  box-shadow:
+    inset 0 3px 6px rgba(40, 0, 0, 0.7),
+    0 1px 0 rgba(255, 150, 130, 0.4);
+}
+
+.knobShadow {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -8%;
+  height: 40%;
+  border-radius: 50%;
+  background: rgba(30, 0, 0, 0.7);
+  filter: blur(7px);
+}
+
+.knobSphere {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #6b6b6b 0%, #262626 30%, #0a0a0a 62%, #000 100%);
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.9),
+    inset 0 2px 2px rgba(255, 255, 255, 0.12);
+  transform-origin: 50% 100%;
+}
+
+.knobSpec {
+  position: absolute;
+  left: 22%;
+  top: 14%;
+  width: 34%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-24deg);
+}
+
+.knob:focus-visible {
+  outline-offset: 10px;
+}
+
+.knobLabel {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--color-cream);
+}
+
+/* ── Caption ─────────────────────────────────────────────── */
+
+.caption {
+  margin-top: calc(var(--h) * 0.24);
+  max-width: 17em;
+  min-height: 2.15em;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: clamp(22px, min(4vw, 6.6svh), 78px);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  color: var(--color-cream);
+}
+
+.cw {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0 0.03em 0.1em;
+  margin: 0 -0.03em -0.1em;
+}
+
+.cwi {
+  display: inline-block;
+}
+
+.em {
+  font-style: italic;
+  color: var(--color-ink);
+}
+
+.hero[data-intro="pending"] .cwi {
+  transform: translateY(110%);
+}
+
+.hero[data-intro="pending"] .rail {
+  opacity: 0;
+}
+
+/* ── Bottom rail ─────────────────────────────────────────── */
+
+.rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  padding: 0 clamp(16px, 2.4vw, 36px) 26px;
+  color: var(--color-cream);
+}
+
+.railLeft {
+  font-size: 11px;
+  max-width: 28em;
+}
+
+.railCenter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.segments {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.seg {
+  position: relative;
+  display: block;
+  width: clamp(18px, 2.2vw, 34px);
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.seg::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  height: 2px;
+  background: rgba(13, 13, 13, 0.26);
+}
+
+.segFill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  height: 2px;
+  background: var(--color-ink);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+.segPast .segFill {
+  transform: scaleX(1);
+}
+
+.segActive .segFill {
+  animation-name: segfill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes segfill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.pause {
+  font-size: 10px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--color-cream);
+  min-width: 5ch;
+  text-align: left;
+}
+
+.railRight {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--color-cream);
+  text-decoration: none;
+}
+
+.scrollLine {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 40px;
+  overflow: hidden;
+  background: rgba(255, 246, 238, 0.35);
+}
+
+.scrollLine span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 14px;
+  background: var(--color-ink);
+  animation: drop 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes drop {
+  from { transform: translateY(-14px); }
+  to { transform: translateY(40px); }
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .rail {
+    grid-template-columns: 1fr auto;
+  }
+  .railLeft {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .machine {
+    --h: 12.5vw;
+  }
+  .counterRow > .slotPos,
+  .engrave,
+  .screw {
+    display: none;
+  }
+  .rail {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding-bottom: 18px;
+  }
+  .railRight {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollLine span {
+    animation: none;
+    transform: translateY(12px);
+  }
+}

@@ -1,0 +1,503 @@
+/* ───────────────────────────────────────────────────────────
+   ACT I: UNMASK
+   The section is taller than the screen: the stage pins for the
+   scroll story, then the machine (Act II) wipes up over it.
+   ─────────────────────────────────────────────────────────── */
+
+.unmask {
+  --arc: #7fd8ff;
+  position: relative;
+  z-index: 1;
+  height: 210vh;
+  height: 210svh;
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  outline: none;
+  background: #030303;
+  touch-action: pan-y;
+}
+
+.stage:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--color-signal);
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  transform-origin: 50% 42%;
+  will-change: transform;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.armour {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.canvas[data-ready="true"] {
+  opacity: 1;
+}
+
+/* CSS-fallback chest reactor glow (WebGL draws its own) */
+.reactor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(127, 216, 255, 0.55) 0%, rgba(127, 216, 255, 0.18) 28%, rgba(127, 216, 255, 0) 62%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: reactor 2.6s ease-in-out infinite;
+}
+
+.canvas[data-ready="true"] ~ .reactor {
+  display: none;
+}
+
+@keyframes reactor {
+  0%, 100% { filter: brightness(0.8); }
+  50% { filter: brightness(1.25); }
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 60% at 50% 38%, transparent 40%, rgba(3, 3, 3, 0.5) 100%),
+    linear-gradient(to bottom, rgba(3, 3, 3, 0.35) 0%, transparent 15%, transparent 78%, rgba(3, 3, 3, 0.7) 100%);
+}
+
+/* The prototype's own very faint grain, kept as-is */
+.grainLocal {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Giant wordmark ──────────────────────────────────────── */
+
+.wordmark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+.wmLayer {
+  position: absolute;
+  inset: 0;
+  font-size: min(20.5vw, 28vh);
+  line-height: 0.8;
+  letter-spacing: -0.035em;
+}
+
+.wmLine {
+  position: absolute;
+  display: flex;
+  white-space: nowrap;
+}
+
+.wmTop {
+  left: clamp(16px, 2.4vw, 36px);
+  top: max(84px, 9vh);
+}
+
+.wmBottom {
+  right: clamp(16px, 2.4vw, 36px);
+  bottom: 4vh;
+}
+
+.wmCharMask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.04em 0.01em 0.02em;
+  margin: -0.04em -0.01em -0.02em;
+}
+
+.wmChar {
+  display: inline-block;
+}
+
+.wmOutline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-cream);
+}
+
+.wmSolid {
+  color: var(--color-cream);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, transparent 0%);
+  mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, transparent 0%);
+}
+
+.subline {
+  position: absolute;
+  left: clamp(16px, 2.4vw, 36px);
+  top: calc(max(84px, 9vh) + min(20.5vw, 28vh) * 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(26vw, 300px);
+  color: var(--color-cream);
+}
+
+.subline :global(.label) {
+  font-size: 11px;
+}
+
+.aka {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+/* ── Eyebrow / hint ──────────────────────────────────────── */
+
+.hint {
+  position: absolute;
+  right: clamp(16px, 2.4vw, 36px);
+  top: max(96px, 12vh);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  pointer-events: none;
+  text-align: right;
+}
+
+.eyebrow {
+  min-height: 1.3em;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: rgba(255, 246, 238, 0.82);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+}
+
+.eyebrow::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 0.25em;
+  vertical-align: -0.12em;
+  background: var(--arc);
+  animation: blink 0.9s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.rule {
+  width: 44px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 246, 238, 0.55), transparent);
+}
+
+/* ── Reticle HUD ─────────────────────────────────────────── */
+
+.reticle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.reticle[data-hidden] {
+  opacity: 0;
+}
+
+.ring {
+  position: absolute;
+  left: -100px;
+  top: -100px;
+  width: 200px;
+  height: 200px;
+  transform: translate3d(-999px, -999px, 0);
+  will-change: transform;
+}
+
+.ring svg {
+  display: block;
+  overflow: visible;
+}
+
+.ringLine,
+.ringDash,
+.ringArc,
+.ringTick {
+  fill: none;
+  stroke: var(--arc);
+  vector-effect: non-scaling-stroke;
+}
+
+.ringLine { stroke-width: 1; opacity: 0.55; }
+.ringDash { stroke-width: 1; stroke-dasharray: 2 6; opacity: 0.4; }
+.ringArc { stroke-width: 1.5; stroke-dasharray: 10 5; opacity: 0.9; }
+.ringTick { stroke-width: 1; opacity: 0.75; }
+
+.ringSpin {
+  transform-origin: 0 0;
+  animation: spin 7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.readout {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 12px;
+  padding: 5px 9px;
+  border: 1px solid rgba(127, 216, 255, 0.35);
+  background: rgba(3, 3, 3, 0.55);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(127, 216, 255, 0.75);
+  white-space: nowrap;
+  transform: translate3d(-999px, -999px, 0);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout b {
+  font-weight: 600;
+  color: var(--arc);
+}
+
+/* ── Stickers ────────────────────────────────────────────── */
+
+.stickerWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stickers {
+  --s: 1;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sticker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--w) * var(--s));
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  outline-offset: 6px;
+  filter: drop-shadow(5px 5px 0 rgba(0, 0, 0, 0.92));
+}
+
+.sticker[data-lifted="true"] {
+  filter: drop-shadow(10px 12px 0 rgba(0, 0, 0, 0.85));
+}
+
+.stickerInner {
+  display: block;
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.stickerInner svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sticker[data-hot="true"] .stickerInner {
+  transform: scale(1.14);
+}
+
+/* ── Lock toggle plate ───────────────────────────────────── */
+
+.toggleWrap {
+  position: absolute;
+  left: clamp(16px, 2.4vw, 36px);
+  bottom: calc(4vh + min(20.5vw, 28vh) * 0.82 + 14px);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #343434 0%, #121212 46%, #030303 54%, #111 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 10px 24px -10px rgba(0, 0, 0, 0.9);
+  color: var(--color-cream);
+}
+
+.toggleRivet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #9a9a9a, #2b2b2b 60%, #050505);
+}
+
+.toggleLabel {
+  font-size: 10.5px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.toggleLabel[data-on="true"] {
+  opacity: 1;
+}
+
+.toggle[aria-pressed="true"] .toggleLabel[data-on="true"] {
+  color: var(--color-red-hi);
+}
+
+.track {
+  position: relative;
+  width: 44px;
+  height: 20px;
+  border-radius: 10px;
+  background: #050505;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.knob {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f2efe8, #a9a59d 70%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  transition: transform 0.45s var(--ease-spring), background 0.3s ease;
+}
+
+.toggle[aria-pressed="true"] .knob {
+  transform: translateX(24px);
+  background: radial-gradient(circle at 35% 30%, #ff8a75, var(--color-red) 70%);
+}
+
+.scrollCue {
+  position: absolute;
+  right: clamp(16px, 2.4vw, 36px);
+  bottom: calc(4vh + min(20.5vw, 28vh) * 0.82 + 18px);
+  font-size: 10.5px;
+  color: rgba(255, 246, 238, 0.72);
+}
+
+/* Intro: letters hidden until the loader opens */
+.unmask[data-intro="pending"] .wmChar {
+  transform: translateY(110%);
+}
+
+/* ── Portrait / mobile ───────────────────────────────────── */
+
+@media (max-aspect-ratio: 4/5) {
+  .layer {
+    object-position: center 10%;
+  }
+  .wmLayer {
+    font-size: 21.5vw;
+  }
+  .wmTop,
+  .wmBottom {
+    left: 16px;
+    right: auto;
+    top: auto;
+  }
+  .wmTop {
+    bottom: calc(5vh + 21.5vw * 0.82);
+  }
+  .wmBottom {
+    bottom: 5vh;
+  }
+  .subline {
+    top: auto;
+    bottom: calc(5vh + 21.5vw * 1.72);
+    max-width: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+  .hint {
+    top: 96px;
+  }
+  .toggleWrap {
+    left: auto;
+    right: 16px;
+    bottom: auto;
+    top: 140px;
+  }
+  .scrollCue {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .reticle {
+    display: none;
+  }
+}
+
+/* ── Reduced motion: normal stacked layout, no pin, static half-open reveal ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .unmask {
+    height: auto;
+  }
+  .ringSpin,
+  .reactor,
+  .eyebrow::after {
+    animation: none;
+  }
+  .unmask[data-intro="pending"] .wmChar {
+    transform: none;
+  }
+}

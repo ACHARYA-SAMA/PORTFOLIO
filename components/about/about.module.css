@@ -1,0 +1,258 @@
+.about {
+  position: relative;
+  z-index: 1;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.wrap {
+  padding: clamp(80px, 10vw, 160px) clamp(16px, 2.4vw, 36px) clamp(90px, 10vw, 170px);
+}
+
+.headRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(13, 13, 13, 0.16);
+  margin-bottom: clamp(20px, 3vw, 48px);
+}
+
+.headKicker { opacity: 0.75; }
+.headMeta { opacity: 0.72; }
+
+.name {
+  margin: 0 0 0 -0.045em;
+  font-size: clamp(76px, 17.2vw, 330px);
+  line-height: 0.8;
+  letter-spacing: -0.035em;
+}
+
+.nameLine {
+  position: relative;
+  display: block;
+  width: max-content;
+}
+
+.aka {
+  position: absolute;
+  right: -0.15em;
+  top: -0.02em;
+  transform: translateX(100%) rotate(-6deg);
+  transform-origin: 0 100%;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.15em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-red);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 6vw, 110px);
+  margin-top: clamp(56px, 8vw, 130px);
+  align-items: start;
+}
+
+.copy {
+  font-family: var(--font-serif);
+  font-size: var(--text-lead);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  padding-left: clamp(0px, 7vw, 120px);
+}
+
+.copy p + p {
+  margin-top: 0.85em;
+  text-indent: 2.4em;
+}
+
+.copy em {
+  color: var(--color-red);
+}
+
+/* SplitText words are inline-blocks; they must not inherit the paragraph indent. */
+.copy p * {
+  text-indent: 0;
+}
+
+.cardCol {
+  position: sticky;
+  top: 110px;
+}
+
+/* ── Driver licence card ─────────────────────────────────── */
+
+.cardWrap {
+  perspective: 1100px;
+  max-width: 480px;
+  margin-left: auto;
+}
+
+.licence {
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 40%),
+    #fbf9f4;
+  color: var(--color-ink);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 0 0 1px rgba(13, 13, 13, 0.08),
+    0 30px 60px -28px rgba(13, 13, 13, 0.45),
+    0 10px 20px -12px rgba(13, 13, 13, 0.25);
+  transform: rotate(-2.5deg);
+}
+
+.licenceBand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: var(--color-red);
+  color: var(--color-cream);
+}
+
+.checker {
+  width: 64px;
+  height: 14px;
+  background:
+    conic-gradient(var(--color-ink) 25%, var(--color-cream) 0 50%, var(--color-ink) 0 75%, var(--color-cream) 0) 0 0 / 7px 7px;
+}
+
+.licenceBody {
+  display: grid;
+  grid-template-columns: 34% 1fr;
+  gap: 18px;
+  padding: 18px;
+}
+
+.photo {
+  aspect-ratio: 4 / 5;
+  color: var(--color-ink);
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 74% 100%, 0 100%);
+  background-color: rgba(13, 13, 13, 0.04);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+  margin: 0;
+  align-content: start;
+}
+
+.field {
+  min-width: 0;
+}
+
+.fieldKey {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin-bottom: 3px;
+}
+
+.fieldValue {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.liveDot {
+  position: relative;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-signal);
+  box-shadow: 0 0 0 1.5px var(--color-ink);
+}
+
+.licenceFoot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px 16px;
+  border-top: 1px dashed rgba(13, 13, 13, 0.22);
+}
+
+.barcode {
+  display: flex;
+  gap: 2px;
+  height: 22px;
+}
+
+.barcode i {
+  display: block;
+  height: 100%;
+  background: var(--color-ink);
+}
+
+.footText {
+  font-size: 10px;
+  opacity: 0.72;
+}
+
+.sheen {
+  position: absolute;
+  inset: -40% -60%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0.55) 48%,
+    rgba(200, 255, 46, 0.12) 52%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  mix-blend-mode: soft-light;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .cardCol {
+    position: relative;
+    top: 0;
+    order: -1;
+  }
+  .cardWrap {
+    margin: 0 auto 0 0;
+  }
+  .copy {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .aka {
+    font-size: 0.2em;
+    top: auto;
+    bottom: -0.05em;
+    right: auto;
+    left: 0;
+    transform: translateY(110%) rotate(-4deg);
+  }
+  .licenceBody {
+    grid-template-columns: 1fr;
+  }
+  .photo {
+    aspect-ratio: 16 / 9;
+  }
+}

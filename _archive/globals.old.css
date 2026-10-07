@@ -1,0 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Poppins:wght@400;600;700;900&family=Montserrat:wght@400;800&display=swap');
+@import 'tailwindcss';
+
+html, body {
+  background-color: #000000 !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Fonts ────────────────────────────────────────────── */
+@font-face {
+  font-family: "Helvetica Regular";
+  src: url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.woff2")
+       format("woff2");
+  font-display: swap;
+}
+
+/* ── Design Tokens ────────────────────────────────────── */
+:root {
+  --void: #000000;
+  --violet: #7B2FBE;
+  --lavender: #C084FC;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.4);
+  --glass-bg: rgba(123,47,190,0.08);
+  --glass-border: rgba(192,132,252,0.15);
+  --accent-yellow: #FDD839;
+  --accent-lime: #A3E635;
+  --accent-red: #f21010;
+  --dark-base: rgb(20,20,20);
+  --split-dark: rgb(3,7,18);
+  --split-light: rgb(163,230,53);
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-handwritten: 'Permanent Marker', cursive;
+  --font-body: 'Poppins', sans-serif;
+}
+
+/* ── Global Resets ────────────────────────────────────── */
+* { cursor: none !important; }
+
+body {
+  background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #7B2FBE transparent;
+}
+
+body::-webkit-scrollbar { width: 6px; }
+body::-webkit-scrollbar-track { background: transparent; }
+body::-webkit-scrollbar-thumb {
+  background: #7B2FBE;
+  border-radius: 3px;
+}
+
+::selection {
+  background: #7B2FBE;
+  color: #fff;
+}
+
+/* ── Noise Overlay ────────────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent url("https://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  animation: noise-animation 0.3s steps(5) infinite;
+  opacity: 0.04;
+  will-change: transform;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+@keyframes noise-animation {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-2%, -3%); }
+  20%  { transform: translate(-4%, 2%); }
+  30%  { transform: translate(2%, -4%); }
+  40%  { transform: translate(-2%, 5%); }
+  50%  { transform: translate(-4%, 2%); }
+  60%  { transform: translate(3%, 0); }
+  70%  { transform: translate(0, 3%); }
+  80%  { transform: translate(-3%, 0); }
+  90%  { transform: translate(2%, 2%); }
+  100% { transform: translate(1%, 0); }
+}
+
+/* ── Liquid Glass ─────────────────────────────────────── */
+.liquid-glass {
+  background: rgba(255,255,255,0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.15) 80%,
+    rgba(255,255,255,0.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Ambient Animations ───────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%      { transform: translateY(-12px) rotate(1deg); }
+  66%      { transform: translateY(-6px) rotate(-0.5deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123,47,190,0.3); }
+  50%      { box-shadow: 0 0 40px rgba(123,47,190,0.6), 0 0 80px rgba(192,132,252,0.2); }
+}
+
+@keyframes scroll-line {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+  50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  51%  { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+/* ── Cursor State Classes ─────────────────────────────── */
+body.cursor-hover .cursor-ring {
+  width: 48px !important;
+  height: 48px !important;
+  background: rgba(123,47,190,0.15) !important;
+  border-color: #C084FC !important;
+}
+
+body.cursor-click .cursor-dot {
+  transform: scale(0.5) translate(-50%, -50%) !important;
+}
+
+body.cursor-text .cursor-ring {
+  width: 3px !important;
+  height: 24px !important;
+  border-radius: 2px !important;
+}
+
+/* ── Reduced Motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ── BLOCK 2: CSS Variables ── */
+:root {
+  --void: #000000;
+  --violet: #7B2FBE;
+  --lavender: #C084FC;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.4);
+  --glass-bg: rgba(123,47,190,0.08);
+  --glass-border: rgba(192,132,252,0.15);
+  --accent-yellow: #FDD839;
+  --accent-lime: #A3E635;
+  --dark: rgb(20,20,20);
+  --c1: rgb(3,7,18);
+  --c2: rgb(163,230,53);
+  --left-color: var(--c1);
+  --right-color: var(--c2);
+  --font1: "Poppins";
+  --fontSizeH1: 19vw;
+  scrollbar-color: #7B2FBE transparent;
+  scrollbar-width: thin;
+}
+
+/* ── BLOCK 3: Scrollbar ── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: #7B2FBE;
+  border-radius: 4px;
+}
+
+/* ── BLOCK 4: Base Reset ── */
+*, *::before, *::after {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+* { cursor: none !important; }
+
+/* ── BLOCK 5: Noise Overlay ── */
+body::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent
+    url("http://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  animation: noise-animation 0.3s steps(5) infinite;
+  opacity: 0.04;
+  will-change: transform;
+  z-index: 9999;
+  pointer-events: none;
+}
+@keyframes noise-animation {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-2%, -3%); }
+  20%  { transform: translate(-4%, 2%); }
+  30%  { transform: translate(2%, -4%); }
+  40%  { transform: translate(-2%, 5%); }
+  50%  { transform: translate(-4%, 2%); }
+  60%  { transform: translate(3%, 0); }
+  70%  { transform: translate(0, 3%); }
+  80%  { transform: translate(-3%, 0); }
+  90%  { transform: translate(2%, 2%); }
+  100% { transform: translate(1%, 0); }
+}
+
+/* ── BLOCK 6: Liquid Glass ── */
+@font-face {
+  font-family: "Helvetica Regular";
+  src: url("https://db.onlinewebfonts.com/t/a64ff11d2c24584c767f6257e880dc65.woff2")
+       format("woff2");
+}
+.liquid-glass {
+  background: rgba(255,255,255,0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.15) 80%,
+    rgba(255,255,255,0.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── BLOCK 7: Split Screen System ── */
+.side {
+  display: grid;
+  height: 100vh;
+  overflow: hidden;
+  place-items: center;
+  position: absolute;
+  width: 100%;
+}
+.side .title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 7vw;
+  font-weight: 800;
+  margin: 0px 10vw;
+  width: 80vw;
+}
+.side .fancy {
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.8em;
+  line-height: 0.6em;
+}
+#left-side {
+  background-color: var(--left-color);
+  width: 60%;
+  z-index: 2;
+}
+#left-side .title { color: white; }
+#left-side .fancy { color: var(--right-color); }
+#right-side { background-color: var(--right-color); }
+#right-side .title { color: var(--dark); }
+#right-side .fancy { color: white; }
+
+/* ── BLOCK 8: Ambient Animations ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-12px) rotate(1deg); }
+  66%       { transform: translateY(-6px) rotate(-0.5deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123,47,190,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(123,47,190,0.6),
+                           0 0 80px rgba(192,132,252,0.2); }
+}
+@keyframes scroll-line {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+  50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  51%  { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+@keyframes wave-effect {
+  0%   { box-shadow: 0 0 0 0px rgba(123,47,190,0.4),
+                     0 0 0 0px rgba(123,47,190,0.4); }
+  40%  { box-shadow: 0 0 0 50px rgba(123,47,190,0),
+                     0 0 0 0px rgba(123,47,190,0.4); }
+  80%  { box-shadow: 0 0 0 50px rgba(123,47,190,0),
+                     0 0 0 30px rgba(123,47,190,0); }
+  100% { box-shadow: 0 0 0 0px rgba(123,47,190,0),
+                     0 0 0 30px rgba(123,47,190,0); }
+}
+
+/* ── BLOCK 9: Clip / Giant Text ── */
+.clip h1 {
+  font-family: "Bebas Neue";
+  font-size: var(--fontSizeH1);
+  font-weight: 400;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: -0.75vw;
+  line-height: 80%;
+  margin: 0;
+  overflow: hidden;
+}
+.clip .h1__stroke {
+  color: transparent;
+  -webkit-text-stroke: 1px #fff;
+}
+
+/* ── BLOCK 10: Framer Motion Stagger Variants (CSS helper classes) ── */
+.stagger-parent { }
+.stagger-item {
+  will-change: transform, opacity;
+}
+.float-element {
+  animation: float 6s ease-in-out infinite;
+}
+.pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+.wave-button {
+  animation: wave-effect 3s ease-in-out infinite;
+}
+
+/* ── BLOCK 11: prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,31 @@
+.head {
+  position: relative;
+}
+
+.headRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding-bottom: 14px;
+  margin-bottom: clamp(18px, 2.6vw, 40px);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.headKicker {
+  opacity: 0.75;
+}
+
+.headMeta {
+  opacity: 0.72;
+}
+
+.title {
+  font-size: var(--text-display);
+  margin: 0;
+  margin-left: -0.04em;
+}
+
+.titleLine {
+  display: block;
+}

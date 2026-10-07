@@ -1,0 +1,88 @@
+.stats {
+  margin-top: clamp(72px, 10vw, 160px);
+  padding-top: 18px;
+  border-top: 1px solid rgba(13, 13, 13, 0.16);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 32px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.face {
+  --h: clamp(26px, 3.1vw, 50px);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, calc(var(--h) * 5.4));
+  aspect-ratio: 1;
+}
+
+.arc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.arcTrack,
+.arcFill {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.arcTrack {
+  stroke: rgba(13, 13, 13, 0.14);
+  stroke-width: 1;
+  stroke-dasharray: 1 5;
+}
+
+.arcFill {
+  stroke: var(--color-ink);
+  stroke-width: 1.25;
+}
+
+.dialIndex {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  opacity: 0.72;
+}
+
+.face > .drums {
+  --h: inherit;
+  padding: calc(var(--h) * 0.07);
+  border-radius: 4px;
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55);
+}
+
+.dialLabel {
+  max-width: 16ch;
+  text-align: center;
+  font-size: 11px;
+}
+
+@media (max-width: 760px) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 40px;
+  }
+  .face {
+    --h: clamp(24px, 7vw, 40px);
+  }
+}

@@ -1,0 +1,517 @@
+.race {
+  position: relative;
+  z-index: 1;
+  background: var(--color-asphalt);
+  color: var(--color-cream);
+  overflow: hidden;
+}
+
+.pin {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 0 28px;
+}
+
+.headRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  margin: 0 clamp(16px, 2.4vw, 36px);
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 246, 238, 0.14);
+}
+
+.headKicker { opacity: 0.75; }
+.counter { font-variant-numeric: tabular-nums; }
+
+.track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.6vw, 44px);
+  width: max-content;
+  padding: 0 clamp(16px, 2.4vw, 36px);
+  will-change: transform;
+}
+
+.trackEnd {
+  width: 12vw;
+  flex: none;
+}
+
+/* ── Intro panel ─────────────────────────────────────────── */
+
+.intro {
+  position: relative;
+  flex: none;
+  width: min(62vw, 980px);
+  height: min(66svh, 620px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: clamp(20px, 4vw, 80px);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(84px, 15vw, 270px);
+  margin-left: -0.04em;
+}
+
+.titleLine { display: block; }
+
+.introCopy {
+  max-width: 24em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(20px, 1.9vw, 32px);
+  line-height: 1.18;
+  color: rgba(255, 246, 238, 0.86);
+}
+
+.hint {
+  display: flex;
+  gap: 10px;
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+.hint span {
+  display: inline-block;
+  animation: nudge 1.6s var(--ease-spring) infinite;
+}
+
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+.stamp {
+  position: absolute;
+  top: 6%;
+  right: 4%;
+  width: clamp(120px, 12vw, 190px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  transform: rotate(-14deg);
+  color: var(--color-red-hi);
+}
+
+.stamp svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: spin 22s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.stampOuter,
+.stampInner {
+  fill: none;
+  stroke: currentColor;
+}
+
+.stampOuter { stroke-width: 3; }
+.stampInner { stroke-width: 1.5; stroke-dasharray: 4 4; }
+
+.stampRing {
+  fill: currentColor;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+.stampText {
+  position: relative;
+  text-align: center;
+  font-size: clamp(26px, 2.6vw, 42px);
+  line-height: 0.82;
+}
+
+/* ── Ticket ──────────────────────────────────────────────── */
+
+.ticket {
+  --perf: 64px;
+  --notch: 11px;
+  --tw: clamp(290px, 27vw, 430px);
+  --text-w: calc(var(--tw) - var(--perf) - 52px);
+  position: relative;
+  flex: none;
+  display: flex;
+  width: var(--tw);
+  height: min(62svh, 560px);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-radius: 6px;
+  outline: none;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at var(--perf) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--perf) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at var(--perf) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--perf) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  transform-origin: 50% 80%;
+}
+
+.ticket:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--color-signal);
+}
+
+.stub {
+  position: relative;
+  flex: none;
+  width: var(--perf);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0;
+  border-right: 2px dashed rgba(13, 13, 13, 0.28);
+}
+
+.stubNo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 75%;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.stubText {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px 20px;
+}
+
+.ticketTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10.5px;
+  opacity: 0.7;
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ticketName {
+  margin: clamp(24px, 4svh, 52px) 0 0;
+  font-size: min(clamp(40px, 4.1vw, 74px), calc(var(--text-w) / (var(--fit) * 0.6)));
+  line-height: 0.86;
+}
+
+.result {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(22px, 1.9vw, 32px);
+  line-height: 1.1;
+}
+
+.detail {
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 1.25vw, 21px);
+  line-height: 1.3;
+  max-width: 26em;
+  opacity: 0.85;
+}
+
+.ticketFoot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.footRule {
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+/* Wide SIH ticket */
+.ticketWide {
+  --tw: clamp(330px, 50vw, 820px);
+  --text-w: calc((var(--tw) - var(--perf) - 76px) * 0.46);
+}
+
+.wideBody {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 24px;
+  align-items: end;
+  min-height: 0;
+}
+
+.vizWrap {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #ebe8e0;
+  padding: 10px;
+}
+
+.kalman {
+  width: 100%;
+  height: auto;
+  color: var(--color-ink);
+}
+
+.kRay {
+  stroke: var(--color-ink);
+  stroke-opacity: 0.18;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.kTruth {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-opacity: 0.35;
+  stroke-width: 1.2;
+  stroke-dasharray: 2 5;
+}
+
+.kDot {
+  fill: var(--color-ink);
+}
+
+.kEst {
+  fill: none;
+  stroke: var(--color-red);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kHead {
+  fill: var(--color-red);
+  stroke: var(--color-paper);
+  stroke-width: 2;
+}
+
+.kCam rect {
+  fill: var(--color-ink);
+}
+
+.kLens {
+  fill: var(--color-paper);
+}
+
+.vizLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 9.5px;
+  opacity: 0.75;
+}
+
+.vizLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lgDot,
+.lgEst,
+.lgTruth {
+  display: inline-block;
+}
+
+.lgDot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-ink); }
+.lgEst { width: 14px; height: 3px; background: var(--color-red); }
+.lgTruth { width: 14px; height: 0; border-top: 1.5px dashed rgba(13, 13, 13, 0.55); }
+
+.flap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 14px;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 246, 238, 0) 0 9px, rgba(255, 246, 238, 0.06) 9px 10px),
+    var(--color-ink);
+  color: var(--color-cream);
+  transition: transform 0.75s var(--ease-expo);
+}
+
+.flapArrow {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 0.8;
+  color: var(--color-red-hi);
+}
+
+.ticketWide[data-open="true"] .flap {
+  transform: translateY(-101%);
+}
+
+/* Black belt ticket */
+.ticketBelt {
+  background: var(--color-red);
+  color: var(--color-cream);
+}
+
+.ticketBelt .stub {
+  border-right-color: rgba(255, 246, 238, 0.35);
+}
+
+.belt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9%;
+  width: 100%;
+  height: 22%;
+  fill: var(--color-ink);
+}
+
+.beltStitch {
+  fill: rgba(255, 246, 238, 0.18);
+}
+
+/* ── Progress rail ───────────────────────────────────────── */
+
+.railWrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 clamp(16px, 2.4vw, 36px);
+  font-size: 10px;
+  color: rgba(255, 246, 238, 0.55);
+}
+
+.rail {
+  position: relative;
+  flex: 1;
+  height: 24px;
+}
+
+.rail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dashed rgba(255, 246, 238, 0.25);
+}
+
+.carWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46px;
+  height: 24px;
+}
+
+.car {
+  width: 100%;
+  height: 100%;
+  fill: var(--color-red-hi);
+}
+
+.carHelmet {
+  fill: var(--color-signal);
+}
+
+/* ── Reduced motion: no pin, tickets wrap ────────────────── */
+
+.race[data-static="true"] .pin {
+  height: auto;
+}
+
+.race[data-static="true"] .track {
+  width: auto;
+  flex-wrap: wrap;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.race[data-static="true"] .railWrap,
+.race[data-static="true"] .trackEnd,
+.race[data-static="true"] .hint {
+  display: none;
+}
+
+.race[data-static="true"] .intro {
+  width: 100%;
+  height: auto;
+  gap: 32px;
+}
+
+@media (max-width: 760px) {
+  .intro {
+    width: 86vw;
+  }
+  .ticket {
+    --tw: 78vw;
+  }
+  .ticketWide {
+    --tw: 88vw;
+    --text-w: calc(var(--tw) - var(--perf) - 52px);
+  }
+  .wideBody {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .vizWrap {
+    margin-top: 8px;
+  }
+  .ticketWide .ticketName {
+    margin-top: 16px;
+  }
+  .stamp {
+    top: 34%;
+    right: 2%;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .ticketName {
+    font-size: min(clamp(36px, 3.4vw, 56px), calc(var(--text-w) / (var(--fit) * 0.6)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp svg,
+  .hint span {
+    animation: none;
+  }
+}
