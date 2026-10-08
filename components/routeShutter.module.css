@@ -1,0 +1,63 @@
+.shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: auto;
+}
+
+/* Closing: the halves meet in the middle. Opening: they part, as the loader does. */
+.top,
+.bottom {
+  transition: transform 0.42s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.shutter[data-phase="closing"] .top {
+  animation: inTop 0.42s cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+.shutter[data-phase="closing"] .bottom {
+  animation: inBottom 0.42s cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+.shutter[data-phase="closed"] .top,
+.shutter[data-phase="closed"] .bottom {
+  transform: none;
+}
+
+.shutter[data-phase="opening"] .top {
+  animation: outTop 0.52s cubic-bezier(0.87, 0, 0.13, 1) both;
+}
+
+.shutter[data-phase="opening"] .bottom {
+  animation: outBottom 0.52s cubic-bezier(0.87, 0, 0.13, 1) both;
+}
+
+@keyframes inTop {
+  from { transform: translateY(-100%); }
+  to { transform: none; }
+}
+
+@keyframes inBottom {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@keyframes outTop {
+  to { transform: translateY(-100%); }
+}
+
+@keyframes outBottom {
+  to { transform: translateY(100%); }
+}
+
+.fade {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--color-ink);
+  animation: fade 0.16s ease both;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}

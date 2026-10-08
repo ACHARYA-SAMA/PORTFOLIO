@@ -6,10 +6,10 @@ import type { PlateHandle } from "./Plate";
 import Machine from "./Machine";
 import HeroRail from "./HeroRail";
 import { SCENES, parseCaption } from "@/lib/content";
+import { sceneText } from "@/lib/scenes";
 import type { RollOptions, RollOrder } from "@/lib/drums";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { hasFinePointer, observeVisibility, prefersReducedMotion } from "@/lib/hooks";
-import { pad } from "@/lib/format";
 import { on } from "@/lib/events";
 import { playThunk } from "@/lib/sound";
 import s from "./hero.module.css";
@@ -23,12 +23,6 @@ type Phase = "scene" | "SCROLL" | "DOWN";
 
 const wrap = (n: number) => ((n % SCENE_COUNT) + SCENE_COUNT) % SCENE_COUNT;
 
-function sceneText(index: number) {
-  const drums = SCENES[index].drums;
-  if (drums !== "DATE") return drums;
-  const d = new Date();
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${String(d.getFullYear()).slice(2)}`;
-}
 
 const escapeHtml = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 

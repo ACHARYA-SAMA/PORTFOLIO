@@ -1,11 +1,14 @@
 "use client";
 
-import { useRef, type CSSProperties, type ElementType, type ReactNode } from "react";
+import { createElement, useRef, type CSSProperties, type ReactNode } from "react";
 import { gsap, SplitText } from "@/lib/gsap";
 import { useGsap } from "@/lib/hooks";
 
+/** Text-level HTML tags only (an open ElementType also admits R3F’s JSX elements, whose props collapse to never). */
+type RevealTag = "div" | "p" | "h2" | "h3" | "span";
+
 type Props = {
-  as?: ElementType;
+  as?: RevealTag;
   type?: "lines" | "words" | "chars";
   className?: string;
   style?: CSSProperties;
@@ -52,9 +55,5 @@ export default function Reveal({
     return () => split.revert();
   });
 
-  return (
-    <Tag ref={ref} className={className} style={style} id={id}>
-      {children}
-    </Tag>
-  );
+  return createElement(Tag, { ref, className, style, id }, children);
 }

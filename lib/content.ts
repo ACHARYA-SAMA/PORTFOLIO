@@ -267,6 +267,14 @@ export const FLYERS = ["Interaction Day", "Murder Mystery", "+ more"];
 export const OFF_TRACK_LINE =
   "The motorcycle is where I think. The games are where I lose gracefully. Both are good practice.";
 
+/** The Off the Track stickers’ words (the sticker board and the world both read these). */
+export const OFF_TRACK_FACTS = {
+  ride: "Rides. Mostly Royal Enfields.",
+  games: ["Valorant", "CS2", "God of War", "GTA V"],
+  anime: "Jujutsu Kaisen",
+  music: "On repeat: Karan Aujla",
+};
+
 /* ── Contact ──────────────────────────────────────────────── */
 
 export const CONTACT_STATUS = "Currently: open to projects, internships and hackathon teams.";

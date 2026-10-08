@@ -124,6 +124,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "roof", label: "Wrong way up", detail: "Five seconds on the roof.", hidden: true },
   { id: "manual", label: "Read the manual", detail: "Opened the controls sheet.", hidden: true },
   { id: "press-kit", label: "Press kit", detail: "Saved a photo from photo mode.", hidden: true },
+  { id: "far-corner", label: "Cartographer", detail: "Found the island’s far corner.", hidden: true },
+  { id: "roundabout", label: "Going round", detail: "A full lap of the roundabout.", hidden: true },
 ];
 
 export const BOLT_COUNT = 40;

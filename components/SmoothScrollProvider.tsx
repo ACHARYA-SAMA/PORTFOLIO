@@ -40,11 +40,20 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
       ScrollTrigger.refresh();
     };
 
+    // Deep links (#garage from the world’s zone panels): measure, then glide there.
+    const jumpToHash = () => {
+      const hash = window.location.hash;
+      if (!hash || hash === "#top") return;
+      const target = document.querySelector<HTMLElement>(hash);
+      if (target) window.setTimeout(() => !cancelled && scrollToTarget(target), 140);
+    };
+
     const offLoader = loaderDone.subscribe(() => {
       if (!loaderDone.get()) return;
       document.documentElement.classList.remove("is-loading");
       lenis?.start();
       refresh();
+      jumpToHash();
     });
 
     document.fonts?.ready.then(() => {
