@@ -1,5 +1,6 @@
 import TransitionLink from "@/components/TransitionLink";
 import s from "./nav.module.css";
+import { PORTFOLIO } from "@/lib/routes";
 
 type Props = { href: string; label: string; sup?: string; active?: boolean; home?: boolean };
 
@@ -7,7 +8,7 @@ type Props = { href: string; label: string; sup?: string; active?: boolean; home
 export default function NavLink({ href, label, sup, active = false, home = true }: Props) {
   if (!home) {
     return (
-      <TransitionLink href={`/${href}`} label={label} className={`label ${s.link}`}>
+      <TransitionLink href={`${PORTFOLIO}${href}`} label={label} className={`label ${s.link}`}>
         <span className={s.roll}>
           <span>{label}</span>
           <span aria-hidden="true">{label}</span>

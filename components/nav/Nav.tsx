@@ -11,6 +11,7 @@ import { ScrollTrigger } from "@/lib/gsap";
 import { pad } from "@/lib/format";
 import { lenisStore, loaderDone, scrollToTarget, transition, useStore } from "@/lib/store";
 import s from "./nav.module.css";
+import { PORTFOLIO, sectionHref } from "@/lib/routes";
 
 // "Garage" carries the project count, derived from the data rather than typed in.
 const LINKS = [
@@ -31,7 +32,7 @@ export default function Nav() {
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const ready = useStore(loaderDone, false);
-  const home = usePathname() === "/";
+  const home = usePathname() === PORTFOLIO;
 
   useEffect(() => {
     const triggers: ScrollTrigger[] = [];
@@ -92,7 +93,7 @@ export default function Nav() {
   const go = (href: string, label: string) => {
     setOpen(false);
     if (home) requestAnimationFrame(() => scrollToTarget(href));
-    else transition.set({ label, phase: "cover", href: `/${href}` });
+    else transition.set({ label, phase: "cover", href: `${PORTFOLIO}${href}` });
   };
 
   return (
@@ -109,7 +110,7 @@ export default function Nav() {
             arman<sup aria-hidden="true">®</sup>
           </a>
         ) : (
-          <TransitionLink href="/" label="Arman" className={s.logo} data-cursor="HOME" aria-label="Arman Acharya, home">
+          <TransitionLink href={PORTFOLIO} label="Arman" className={s.logo} data-cursor="HOME" aria-label="Arman Acharya, home">
             arman<sup aria-hidden="true">®</sup>
           </TransitionLink>
         )}
@@ -129,7 +130,7 @@ export default function Nav() {
               <span>Let’s talk</span>
             </a>
           ) : (
-            <TransitionLink href="/#contact" label="Pit exit" className={`label ${s.pill}`} data-cursor="HELLO">
+            <TransitionLink href={sectionHref("contact")} label="Pit exit" className={`label ${s.pill}`} data-cursor="HELLO">
               <span className={s.live} aria-hidden="true" />
               <span>Let’s talk</span>
             </TransitionLink>

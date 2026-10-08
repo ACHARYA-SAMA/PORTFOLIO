@@ -8,6 +8,7 @@ import { prefersReducedMotion, useIsoLayoutEffect } from "@/lib/hooks";
 import { pad } from "@/lib/format";
 import { lenisStore } from "@/lib/store";
 import s from "./garage.module.css";
+import { workHref } from "@/lib/routes";
 
 type Props = {
   project: Project;
@@ -159,7 +160,7 @@ export default function CaseOverlay({ project, index, total, source, onClose, on
         </div>
 
         <div className={s.overlayActions} data-rise="">
-          <TransitionLink href={`/work/${project.id}`} label={project.title} className={`label ${s.nextBtn}`} data-cursor="OPEN">
+          <TransitionLink href={workHref(project.id)} label={project.title} className={`label ${s.nextBtn}`} data-cursor="OPEN">
             Full case file <span aria-hidden="true">↗</span>
           </TransitionLink>
           <button type="button" className={`label ${s.ghostBtn}`} onClick={onNext} data-cursor="NEXT">

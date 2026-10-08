@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CHAPTERS, CONTACT, chapterNo } from "@/lib/content";
 import { lenisStore, scrollToTarget, soundOn, toast, transition } from "@/lib/store";
 import { setSound } from "@/lib/sound";
+import { PORTFOLIO, sectionHref } from "@/lib/routes";
 
 type Command = { id: string; group: string; label: string; hint: string; run: () => void };
 
@@ -18,8 +19,8 @@ export default function CommandPalette() {
 
   const commands = useMemo<Command[]>(() => {
     const jump = (id: string, label: string) => () => {
-      if (pathname === "/") scrollToTarget(id === "unmask" ? 0 : `#${id}`);
-      else transition.set({ label, phase: "cover", href: `/#${id}` });
+      if (pathname === PORTFOLIO) scrollToTarget(id === "unmask" ? 0 : `#${id}`);
+      else transition.set({ label, phase: "cover", href: sectionHref(id) });
     };
     return [
       ...CHAPTERS.map((c) => ({

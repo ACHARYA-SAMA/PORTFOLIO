@@ -5,6 +5,7 @@ import TextScramble from "@/components/ui/TextScramble";
 import { PROJECTS } from "@/lib/content";
 import { pad } from "@/lib/format";
 import s from "./case.module.css";
+import { sectionHref, workHref } from "@/lib/routes";
 
 /** Full case file route. Same facts as the overlay; everything not in the brief is a labelled TODO. */
 export default function CaseStudy({ index }: { index: number }) {
@@ -15,7 +16,7 @@ export default function CaseStudy({ index }: { index: number }) {
   return (
     <article className={s.case} data-theme="ink" aria-labelledby="case-page-title">
       <div className={`label ${s.bar}`}>
-        <TransitionLink href="/#garage" label="The Garage" className={s.back} data-cursor="BACK">
+        <TransitionLink href={sectionHref("garage")} label="The Garage" className={s.back} data-cursor="BACK">
           ← The Garage
         </TransitionLink>
         <span>
@@ -77,11 +78,11 @@ export default function CaseStudy({ index }: { index: number }) {
       </div>
 
       <nav className={s.pager} aria-label="More builds">
-        <TransitionLink href={`/work/${prev.id}`} label={prev.title} className={s.pagerLink} data-cursor="PREV">
+        <TransitionLink href={workHref(prev.id)} label={prev.title} className={s.pagerLink} data-cursor="PREV">
           <span className="label">← Previous</span>
           <span className={`display ${s.pagerTitle}`}>{prev.title}</span>
         </TransitionLink>
-        <TransitionLink href={`/work/${next.id}`} label={next.title} className={`${s.pagerLink} ${s.pagerNext}`} data-cursor="NEXT">
+        <TransitionLink href={workHref(next.id)} label={next.title} className={`${s.pagerLink} ${s.pagerNext}`} data-cursor="NEXT">
           <span className="label">Next →</span>
           <span className={`display ${s.pagerTitle}`}>{next.title}</span>
         </TransitionLink>
