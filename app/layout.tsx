@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/site";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -24,9 +25,14 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Arman Acharya (Raj): Frontend, Computer Vision, Design",
-  description:
-    "Arman Acharya, B.Tech CSE (Data Science) at MLR Institute of Technology, Hyderabad. Frontend developer, designer, computer-vision tinkerer and state-level karate champion.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  applicationName: "Arman Acharya",
+  authors: [{ name: "Arman Acharya" }],
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", url: "/", siteName: "Arman Acharya", title: SITE_TITLE, description: SITE_DESCRIPTION, locale: "en_IN" },
+  twitter: { card: "summary_large_image", title: SITE_TITLE, description: SITE_DESCRIPTION },
 };
 
 export const viewport: Viewport = {

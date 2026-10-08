@@ -18,8 +18,8 @@ export const CONTACT = {
   email: "25r21a6704@mlrit.ac.in",
   linkedin: { label: "linkedin.com/in/arman-acharya", href: "https://linkedin.com/in/arman-acharya" },
   github: { label: "github.com/arman-acharya", href: "https://github.com/arman-acharya" },
-  // TODO: drop the real CV into /public with this exact filename.
-  cv: "/arman-acharya-cv.pdf",
+  // The printable CV page, generated from this file (print to PDF from there).
+  cv: "/portfolio/cv",
 };
 
 /* ── Chapters (ChapterIndex, command palette, section eyebrows) ── */

@@ -4,6 +4,7 @@ import Nav from "@/components/nav/Nav";
 import Footer from "@/components/footer/Footer";
 import CaseStudy from "@/components/garage/CaseStudy";
 import { PROJECTS } from "@/lib/content";
+import { workHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
@@ -15,9 +16,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const project = PROJECTS.find((p) => p.id === slug);
   if (!project) return {};
+  const title = `${project.title}: Arman Acharya`;
+  const description = project.line ?? `${project.title}, a project by Arman Acharya.`;
   return {
-    title: `${project.title}: Arman Acharya`,
-    description: project.line ?? `${project.title}, a project by Arman Acharya.`,
+    title,
+    description,
+    alternates: { canonical: workHref(project.id) },
+    openGraph: { type: "article", url: workHref(project.id), siteName: "Arman Acharya", title, description },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

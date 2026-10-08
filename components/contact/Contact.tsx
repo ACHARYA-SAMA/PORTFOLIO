@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import OdometerDrums, { type DrumsHandle } from "@/components/OdometerDrums";
 import MagneticButton from "@/components/ui/MagneticButton";
 import CardSlot from "@/components/hero/CardSlot";
+import ContactForm from "./ContactForm";
+import { mailtoHref } from "@/lib/contact";
 import { CONTACT, CONTACT_STATUS, chapterNo } from "@/lib/content";
 import type { RollOrder } from "@/lib/drums";
 import { ScrollTrigger } from "@/lib/gsap";
@@ -49,7 +51,7 @@ export default function Contact() {
       toast("Copied");
       window.setTimeout(() => setCopied(false), 2200);
     } catch {
-      window.location.href = `mailto:${CONTACT.email}`;
+      window.location.href = mailtoHref();
     }
   };
 
@@ -116,7 +118,7 @@ export default function Contact() {
             <div className={s.cvMachine}>
               <CardSlot className={s.cvSlot} />
             </div>
-            <p className={`label ${s.cvHint}`}>Click the card. It drops, comes back, opens the PDF.</p>
+            <p className={`label ${s.cvHint}`}>Click the card. It drops, comes back, opens the CV.</p>
           </div>
         </div>
 
@@ -124,6 +126,8 @@ export default function Contact() {
           <span className={s.live} aria-hidden="true" />
           {CONTACT_STATUS}
         </p>
+
+        <ContactForm />
       </div>
     </section>
   );

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { CHAPTERS, chapterNo } from "@/lib/content";
 import { ScrollTrigger } from "@/lib/gsap";
 import { scrollToTarget } from "@/lib/store";
+import TransitionLink from "@/components/TransitionLink";
+import { PORTFOLIO } from "@/lib/routes";
 import s from "./hud.module.css";
 
 /** Fixed mono index, 01 UNMASK to 12 FOOTER. Collapsed to the current chapter; opens on hover or focus. */
@@ -42,6 +44,20 @@ export default function ChapterIndex() {
             </button>
           </li>
         ))}
+        {/* Pages beyond the scroll: the CV, and the world this site sits inside. */}
+        <li className={s.chapterSep} aria-hidden="true" />
+        <li>
+          <TransitionLink href={`${PORTFOLIO}/cv`} label="CV" className={`label ${s.chapter}`}>
+            <span>CV</span>
+            Printable CV
+          </TransitionLink>
+        </li>
+        <li>
+          <a href="/?world=1" className={`label ${s.chapter}`}>
+            <span>↗</span>
+            Back to world
+          </a>
+        </li>
       </ol>
       <span className={`label ${s.chapterNow}`} aria-hidden="true">
         <b>{chapterNo(now.id)}</b> / {String(CHAPTERS.length).padStart(2, "0")} · {now.label}

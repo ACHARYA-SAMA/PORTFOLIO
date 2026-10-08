@@ -99,6 +99,16 @@
   opacity: 0.55;
 }
 
+a.chapter {
+  text-decoration: none;
+}
+
+.chapterSep {
+  height: 1px;
+  margin: 6px 8px;
+  background: rgba(255, 246, 238, 0.1);
+}
+
 .chapter:hover,
 .chapter:focus-visible {
   color: var(--color-cream);

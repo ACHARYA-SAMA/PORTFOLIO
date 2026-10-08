@@ -6,6 +6,7 @@ import { CHAPTERS, CONTACT, chapterNo } from "@/lib/content";
 import { lenisStore, scrollToTarget, soundOn, toast, transition } from "@/lib/store";
 import { setSound } from "@/lib/sound";
 import { PORTFOLIO, sectionHref } from "@/lib/routes";
+import { mailtoHref } from "@/lib/contact";
 
 type Command = { id: string; group: string; label: string; hint: string; run: () => void };
 
@@ -39,10 +40,12 @@ export default function CommandPalette() {
           void navigator.clipboard?.writeText(CONTACT.email).then(() => toast("Copied"));
         },
       },
-      { id: "mail", group: "Contact", label: "Write an email", hint: "↗", run: () => (window.location.href = `mailto:${CONTACT.email}`) },
-      { id: "cv", group: "Contact", label: "Open CV", hint: "PDF", run: () => window.open(CONTACT.cv, "_blank", "noopener,noreferrer") },
+      { id: "mail", group: "Contact", label: "Write an email", hint: "↗", run: () => (window.location.href = mailtoHref()) },
+      { id: "cv", group: "Contact", label: "Open CV", hint: "A4", run: () => window.open(CONTACT.cv, "_blank", "noopener,noreferrer") },
       { id: "gh", group: "Contact", label: "Open GitHub", hint: "↗", run: () => window.open(CONTACT.github.href, "_blank", "noopener,noreferrer") },
       { id: "li", group: "Contact", label: "Open LinkedIn", hint: "↗", run: () => window.open(CONTACT.linkedin.href, "_blank", "noopener,noreferrer") },
+      // BackToWorldLink's destination: ?world=1 gets past "skip intro next time".
+      { id: "world", group: "Site", label: "Back to world", hint: "↗", run: () => window.location.assign("/?world=1") },
       {
         id: "sound",
         group: "Site",

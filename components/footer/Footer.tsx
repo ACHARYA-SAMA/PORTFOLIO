@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import OdometerDrums, { type DrumsHandle } from "@/components/OdometerDrums";
 import FooterWordmark from "./FooterWordmark";
+import TrophyCabinet from "./TrophyCabinet";
 import { istParts } from "@/components/nav/LiveClock";
 import { scrollToTarget } from "@/lib/store";
 import s from "./footer.module.css";
@@ -67,6 +68,7 @@ export default function Footer() {
 
   return (
     <footer id="footer" className={s.footer} data-theme="ink">
+      <TrophyCabinet />
       <div className={s.top}>
         <div className={s.time}>
           <span className={`label ${s.key}`}>Hyderabad · IST</span>

@@ -655,3 +655,18 @@ html.has-cursor * { cursor: none !important; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────────────────────────────────────────────────────
+   PRINT — a page that marks one element as [data-print-root]
+   prints that element alone (the CV). Everything that is not
+   the root or one of its ancestors is removed from the flow.
+   ─────────────────────────────────────────────────────────── */
+@media print {
+  html:has([data-print-root]),
+  html:has([data-print-root]) body {
+    background: #fff !important;
+  }
+  body:has([data-print-root]) *:not(:has([data-print-root])):not([data-print-root]):not([data-print-root] *) {
+    display: none !important;
+  }
+}
