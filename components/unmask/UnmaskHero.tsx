@@ -27,8 +27,36 @@ const IDLE_AFTER_MS = 3500;
 const IDLE_RADIUS = 220;
 const PULSE_RADIUS = 200;
 const STATIC_RADIUS = 210;
+const POWER_FALLOFF = 520;
+const BURST_MAX = 150;
+
+/** Desktop landscape: the portrait is fitted by height in a 3:4 frame instead of cover-cropped. */
+const DESKTOP_FIT = "(min-width: 900px) and (orientation: landscape)";
+/** Desktop spotlight radius as a fraction of the frame height (tuned so a still pointer clears the whole face). */
+const FIT_RADIUS = 0.2;
 
 type Mode = "intro" | "pointer" | "idle" | "keys";
+
+/** The portrait frame inside the stage, in stage px. On phones it is the stage itself. */
+type Box = { w: number; h: number; fx: number; fy: number; fw: number; fh: number };
+
+type Radii = { main: number; idle: number; pulse: number; still: number; falloff: number; burst: number; k: number };
+
+const PHONE_RADII: Radii = { main: RADIUS, idle: IDLE_RADIUS, pulse: PULSE_RADIUS, still: STATIC_RADIUS, falloff: POWER_FALLOFF, burst: BURST_MAX, k: 1 };
+
+function radiiFor(box: Box, fitted: boolean): Radii {
+  if (!fitted) return PHONE_RADII;
+  const k = (box.fh * FIT_RADIUS) / RADIUS;
+  return {
+    main: RADIUS * k,
+    idle: IDLE_RADIUS * k,
+    pulse: PULSE_RADIUS * k,
+    still: STATIC_RADIUS * k,
+    falloff: POWER_FALLOFF * k,
+    burst: BURST_MAX * k,
+    k,
+  };
+}
 
 export default function UnmaskHero() {
   preload(PORTRAIT, { as: "image", fetchPriority: "high" });
@@ -85,13 +113,33 @@ export default function UnmaskHero() {
       introDone: false,
     };
 
-    const size = () => ({ w: stage.clientWidth, h: stage.clientHeight });
     const portraitCrop = window.matchMedia("(max-aspect-ratio: 4/5)");
-    /** Face centre as a fraction of the stage, using the same cover crop as the images. */
+    const desktopFit = window.matchMedia(DESKTOP_FIT);
+    /** Layout box (untransformed), so the scroll story's scale never skews the maths. */
+    const box = (): Box => {
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      const fit = frameRef.current;
+      if (!desktopFit.matches || !fit) return { w, h, fx: 0, fy: 0, fw: w, fh: h };
+      return { w, h, fx: fit.offsetLeft, fy: fit.offsetTop, fw: fit.offsetWidth, fh: fit.offsetHeight };
+    };
+    const size = () => {
+      const b = box();
+      return { w: b.w, h: b.h };
+    };
+    const radii = () => radiiFor(box(), desktopFit.matches);
+    /** Face centre as a fraction of the stage, using the same cover crop as the images (inside the frame). */
     const face = () => {
-      const { w, h } = size();
-      const p = imageToStage(FACE.u, FACE.v, w, h, 0.5, portraitCrop.matches ? 0.1 : 0.15);
-      return { x: p.x / w, y: p.y / h, scale: p.scale };
+      const b = box();
+      const p = imageToStage(FACE.u, FACE.v, b.fw, b.fh, 0.5, portraitCrop.matches ? 0.1 : 0.15);
+      return { x: (b.fx + p.x) / b.w, y: (b.fy + p.y) / b.h, scale: p.scale };
+    };
+    /** Stage px → the frame's own px, which is what the shader and the CSS mask draw in. */
+    const toFrame = (state: SpotState): SpotState => {
+      const b = box();
+      if (!b.fx && !b.fy) return state;
+      const [rx, ry, age] = state.ripple;
+      return { ...state, x: state.x - b.fx, y: state.y - b.fy, ripple: [rx - b.fx, ry - b.fy, age] };
     };
 
     const f0 = face();
@@ -122,7 +170,7 @@ export default function UnmaskHero() {
       st.ty = p.y;
       st.pointerOn = true;
       markInput("pointer");
-      if (!st.locked) st.tr = RADIUS;
+      if (!st.locked) st.tr = radii().main;
     };
     const onLeave = () => {
       st.pointerOn = false;
@@ -157,10 +205,10 @@ export default function UnmaskHero() {
       playSwitch();
       st.spring = true;
       if (value) {
-        const { w, h } = size();
-        st.tr = Math.max(w, h) * 0.34;
+        const b = box();
+        st.tr = Math.max(b.fw, b.fh) * 0.34;
       } else {
-        st.tr = st.pointerOn ? RADIUS : 0;
+        st.tr = st.pointerOn ? radii().main : 0;
       }
     };
     api.current = { toggleLock: () => setLock(!st.locked) };
@@ -186,10 +234,12 @@ export default function UnmaskHero() {
         st.tx = st.cx;
         st.ty = st.cy;
       }
-      st.tx = Math.min(1, Math.max(0, st.tx + m[0]));
-      st.ty = Math.min(1, Math.max(0, st.ty + m[1]));
+      // Keys stay on the portrait: the whole stage on phones, the fitted frame on desktop.
+      const b = box();
+      st.tx = Math.min((b.fx + b.fw) / b.w, Math.max(b.fx / b.w, st.tx + m[0]));
+      st.ty = Math.min((b.fy + b.fh) / b.h, Math.max(b.fy / b.h, st.ty + m[1]));
       markInput("keys");
-      if (!st.locked) st.tr = RADIUS;
+      if (!st.locked) st.tr = radii().main;
     };
 
     /* ── reduced motion: static half-open reveal, nothing moves ── */
@@ -197,9 +247,9 @@ export default function UnmaskHero() {
       const draw = () => {
         const { w, h } = size();
         const f = face();
-        const state: SpotState = { x: f.x * w, y: f.y * h, r: STATIC_RADIUS, vx: 0, vy: 0, time: 0, lock: 1, power: 0.6, desat: 0, ripple: [-1, -1, -1] };
+        const state: SpotState = { x: f.x * w, y: f.y * h, r: radii().still, vx: 0, vy: 0, time: 0, lock: 1, power: 0.6, desat: 0, ripple: [-1, -1, -1] };
         spot.current = { x: state.x, y: state.y, r: state.r };
-        shader.current?.update(state);
+        shader.current?.update(toFrame(state));
         wordmark.current?.spot(state.x, state.y, state.r);
       };
       draw();
@@ -226,8 +276,10 @@ export default function UnmaskHero() {
       if (!st.visible) return;
       const now = performance.now();
       const time = (now - t0) / 1000;
-      const { w, h } = size();
+      const b = box();
+      const { w, h } = b;
       if (!w || !h) return;
+      const R = radiiFor(b, desktopFit.matches);
 
       // Idle: a slow figure-eight across the face after 3.5s without input.
       const idleFor = now - st.lastInput;
@@ -240,7 +292,7 @@ export default function UnmaskHero() {
         const a = k * 0.55;
         st.tx = f.x + ax * Math.sin(a);
         st.ty = f.y + ay * Math.sin(a) * Math.cos(a) * 1.6;
-        st.tr = IDLE_RADIUS;
+        st.tr = R.idle;
       }
 
       // Prototype easing.
@@ -258,7 +310,7 @@ export default function UnmaskHero() {
       const speed = Math.hypot(st.vx, st.vy);
 
       // A quick flick briefly opens the radius.
-      const burstTarget = st.mode === "pointer" ? Math.min(speed * 5, 150) : 0;
+      const burstTarget = st.mode === "pointer" ? Math.min(speed * 5, R.burst) : 0;
       st.burst += (burstTarget - st.burst) * (burstTarget > st.burst ? 0.3 : 0.05);
 
       const target = st.tr + (st.locked ? 0 : st.burst);
@@ -276,13 +328,13 @@ export default function UnmaskHero() {
       const f = face();
       const reveal = st.story.reveal;
       const ease = reveal * reveal * (3 - 2 * reveal);
-      const diag = Math.hypot(w, h) * 1.25;
+      const diag = Math.hypot(b.fw, b.fh) * 1.25;
       const x = px + (f.x * w - px) * ease;
       const y = py + (f.y * h - py) * ease;
       const r = Math.max(0, st.cr) + (diag - Math.max(0, st.cr)) * ease;
 
       const rippleAge = st.ripple[2] >= 0 ? (now - st.rippleAt) / 1000 : -1;
-      const power = Math.max(0, 1 - r / 520) * (1 - ease);
+      const power = Math.max(0, 1 - r / R.falloff) * (1 - ease);
 
       const state: SpotState = {
         x,
@@ -297,11 +349,11 @@ export default function UnmaskHero() {
         ripple: [st.ripple[0], st.ripple[1], rippleAge > 2.5 ? -1 : rippleAge],
       };
       spot.current = { x, y, r };
-      shader.current?.update(state);
+      shader.current?.update(toFrame(state));
       wordmark.current?.spot(x, y, r);
-      reticle.current?.update(px, py, Math.max(0, st.cr), st.cx, st.cy);
+      reticle.current?.update(px, py, Math.max(0, st.cr), (px - b.fx) / b.fw, (py - b.fy) / b.fh);
       reticle.current?.hide(reveal > 0.04);
-      servoUpdate(Math.min(1, r / 600 + speed / 60) * (1 - ease));
+      servoUpdate(Math.min(1, r / (600 * R.k) + speed / 60) * (1 - ease));
     };
     gsap.ticker.add(tick);
 
@@ -326,7 +378,7 @@ export default function UnmaskHero() {
       gsap.to(section.querySelectorAll(`.${s.wmChar}`), { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.05, delay: 0.1 });
       introTl = gsap
         .timeline({ onInterrupt: () => typeEyebrow() })
-        .to(st, { tr: PULSE_RADIUS, duration: 0.9, ease: "expo.out" }, 0.75)
+        .to(st, { tr: radii().pulse, duration: 0.9, ease: "expo.out" }, 0.75)
         .to(st, { tr: 0, duration: 0.7, ease: "power3.inOut" }, "+=0.6")
         .call(() => typeEyebrow(), [], "-=0.2");
     });
@@ -353,12 +405,12 @@ export default function UnmaskHero() {
 
     /* ── Konami: fire the full armour reveal ── */
     const offKonami = on("unmask:reveal", () => {
-      const { w, h } = size();
+      const b = box();
       markInput("pointer");
       gsap
         .timeline()
-        .to(st, { tr: Math.hypot(w, h), duration: 0.9, ease: "expo.out" })
-        .to(st, { tr: st.locked ? Math.max(w, h) * 0.34 : 0, duration: 0.8, ease: "power3.inOut" }, "+=1.2");
+        .to(st, { tr: Math.hypot(b.fw, b.fh), duration: 0.9, ease: "expo.out" })
+        .to(st, { tr: st.locked ? Math.max(b.fw, b.fh) * 0.34 : 0, duration: 0.8, ease: "power3.inOut" }, "+=1.2");
     });
 
     /* ── scroll story: pin, swallow the frame, split the name, scale and desaturate ── */
@@ -422,10 +474,13 @@ export default function UnmaskHero() {
         data-cursor-variant="glow"
         onKeyDown={(e) => keyHandler.current(e)}
       >
-        <div ref={frameRef} className={s.frame}>
-          <SpotlightShader ref={shader} portrait={PORTRAIT} armour={ARMOUR} posY={posY} />
-          <div className={s.vignette} aria-hidden="true" />
-          <div className={s.grainLocal} aria-hidden="true" />
+        {/* fit: the unit of alignment (and the edge feather on desktop); frame: the clipped photo. */}
+        <div ref={frameRef} className={s.fit}>
+          <div className={s.frame}>
+            <SpotlightShader ref={shader} portrait={PORTRAIT} armour={ARMOUR} posY={posY} />
+            <div className={s.vignette} aria-hidden="true" />
+            <div className={s.grainLocal} aria-hidden="true" />
+          </div>
         </div>
 
         <GiantWordmark ref={wordmark} subline={UNMASK.subline} aka={UNMASK.aka} />

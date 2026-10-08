@@ -51,8 +51,10 @@ function Board({
     scaleFor: (width) => Math.max(0.55, Math.min(1, width / 1400)),
     onDrag: (b) => {
       const sp = spot.current;
-      const cx = b.x + b.w / 2;
-      const cy = b.y + b.h / 2;
+      // The spot is in stage px; on desktop the board is anchored to the portrait frame, not the stage.
+      const wrap = layerRef.current?.parentElement;
+      const cx = b.x + b.w / 2 + (wrap?.offsetLeft ?? 0);
+      const cy = b.y + b.h / 2 + (wrap?.offsetTop ?? 0);
       b.el.dataset.hot = String(sp.r > 20 && Math.hypot(cx - sp.x, cy - sp.y) < sp.r * 0.8);
     },
     onRelease: (b) => {

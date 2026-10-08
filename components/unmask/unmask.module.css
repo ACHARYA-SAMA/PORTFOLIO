@@ -29,13 +29,18 @@
   box-shadow: inset 0 0 0 2px var(--color-signal);
 }
 
+.fit {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 42%;
+  will-change: transform;
+}
+
 .frame {
   position: absolute;
   inset: 0;
   overflow: hidden;
   border-radius: 18px;
-  transform-origin: 50% 42%;
-  will-change: transform;
 }
 
 .layer {
@@ -483,6 +488,70 @@
 @media (max-width: 760px) {
   .reticle {
     display: none;
+  }
+}
+
+/* ── Desktop landscape: fit the 3:4 portrait by height ───────
+   cover on a landscape screen showed ~42% of the photo's height.
+   Here the frame takes the photo's aspect ratio, so nothing is
+   cropped; the side areas carry the photo's own edge light.
+   Edge colours sampled from both layers' outer 12px columns
+   (top half): left ≈ #13016a / #010a49, right ≈ #55010e / #310102. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .stage {
+    --fit-h: max(100svh, 560px);
+    --fit-w: calc(var(--fit-h) * 0.75);
+    --gutter: clamp(16px, 2.4vw, 36px);
+    /* ARMAN + ACHARYA on one row ≈ 7.6em, so this is ~90% of the viewport width. */
+    --wm: min(11.8vw, 30svh);
+    background:
+      radial-gradient(calc(var(--fit-h) * 0.62) calc(var(--fit-h) * 0.7) at calc(50% - var(--fit-w) / 2) 30%, rgb(8 6 86 / 0.95), rgb(8 6 86 / 0.4) 38%, transparent 100%),
+      radial-gradient(calc(var(--fit-h) * 0.62) calc(var(--fit-h) * 0.7) at calc(50% + var(--fit-w) / 2) 26%, rgb(63 1 7 / 0.95), rgb(63 1 7 / 0.4) 38%, transparent 100%),
+      #030303;
+  }
+
+  /* The feather lives on the parent of the photo, so it never fights the spotlight mask. */
+  .fit {
+    right: auto;
+    left: calc(50% - var(--fit-w) / 2);
+    width: var(--fit-w);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+  }
+
+  .wmLayer {
+    font-size: var(--wm);
+  }
+  .wmTop {
+    left: var(--gutter);
+    top: auto;
+    bottom: 4vh;
+  }
+  .wmBottom {
+    right: var(--gutter);
+    bottom: 4vh;
+  }
+
+  .subline {
+    left: var(--gutter);
+    top: max(110px, 13vh);
+    max-width: min(calc(50vw - var(--fit-w) / 2 - var(--gutter) - 12px), 420px);
+  }
+
+  .toggleWrap {
+    left: var(--gutter);
+    bottom: calc(4vh + var(--wm) * 0.82 + 18px);
+  }
+  .scrollCue {
+    right: var(--gutter);
+    bottom: calc(4vh + var(--wm) * 0.82 + 22px);
+  }
+
+  /* Stickers ride the frame's edges, not the viewport's. */
+  .stickerWrap {
+    right: auto;
+    left: calc(50% - var(--fit-w) * 0.7);
+    width: calc(var(--fit-w) * 1.4);
   }
 }
 
