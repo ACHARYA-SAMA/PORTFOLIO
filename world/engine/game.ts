@@ -871,7 +871,9 @@ export class Game {
     const ms = rawDt * 1000;
     this.frameTimes.push(ms);
     if (this.frameTimes.length > 120) this.frameTimes.shift();
-    const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
+    let sum = 0;
+    for (let i = 0; i < this.frameTimes.length; i++) sum += this.frameTimes[i];
+    const avg = this.frameTimes.length ? sum / this.frameTimes.length : ms;
     telemetry.frameMs = avg;
     telemetry.fps = avg > 0 ? 1000 / avg : 0;
     if (this.prefs.quality !== "auto" || ui.get().phase === "loading" || this.time < this.tierCheckAt || document.hidden || this.frameTimes.length < 60) return;

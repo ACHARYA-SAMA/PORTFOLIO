@@ -135,11 +135,18 @@ export default function UnmaskHero() {
       return { x: (b.fx + p.x) / b.w, y: (b.fy + p.y) / b.h, scale: p.scale };
     };
     /** Stage px → the frame's own px, which is what the shader and the CSS mask draw in. */
+    const framed: SpotState = { x: 0, y: 0, r: 0, vx: 0, vy: 0, time: 0, lock: 0, power: 0, desat: 0, ripple: [-1, -1, -1] };
     const toFrame = (state: SpotState): SpotState => {
       const b = box();
       if (!b.fx && !b.fy) return state;
-      const [rx, ry, age] = state.ripple;
-      return { ...state, x: state.x - b.fx, y: state.y - b.fy, ripple: [rx - b.fx, ry - b.fy, age] };
+      // One reused object: this runs every frame.
+      Object.assign(framed, state);
+      framed.x = state.x - b.fx;
+      framed.y = state.y - b.fy;
+      framed.ripple[0] = state.ripple[0] - b.fx;
+      framed.ripple[1] = state.ripple[1] - b.fy;
+      framed.ripple[2] = state.ripple[2];
+      return framed;
     };
 
     const f0 = face();

@@ -332,6 +332,13 @@ export class Destruction {
     return arch;
   }
 
+  /** Room left for another instanced object of this archetype (runtime spawns check this; layouts are sized to fit). */
+  canSpawn(archId: string) {
+    const arch = this.archetypes.get(archId);
+    if (!arch) return false;
+    return !arch.mesh || arch.free.length > 0 || arch.used < (arch.capacity ?? 0);
+  }
+
   /** Place one intact object. Dynamic and asleep unless anchored. */
   spawn(archId: string, x: number, y: number, z: number, yaw = 0, opts: SpawnOpts = {}): Entity {
     const arch = this.archetypes.get(archId);

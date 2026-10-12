@@ -8,18 +8,25 @@ import { validateContact, type ContactInput } from "@/lib/contact";
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 3;
+/** Ceiling across all senders: forwarded-for headers can be forged, so per-sender limits alone are not enough. */
+const MAX_GLOBAL = 60;
 // Best effort: per server instance. A shared store (KV, Redis) would make it global.
 const hits = new Map<string, number[]>();
+let global: number[] = [];
 
 function limited(key: string, now = Date.now()) {
+  global = global.filter((t) => now - t < WINDOW_MS);
+  if (global.length >= MAX_GLOBAL) return true;
   const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
   if (recent.length >= MAX_PER_WINDOW) {
     hits.set(key, recent);
     return true;
   }
   recent.push(now);
+  global.push(now);
   hits.set(key, recent);
-  if (hits.size > 5000) hits.clear();
+  // Forget only expired senders, never the whole table.
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.every((t) => now - t >= WINDOW_MS)) hits.delete(k);
   return false;
 }
 

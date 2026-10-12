@@ -34,6 +34,7 @@ export default function Minimap() {
     paintRoads(m, mapPx, { detail: false });
     const scale = (SIZE / 2 / RANGE) * dpr; // px per metre
     const mapScale = mapPx / (ISLAND.half * 2);
+    const monoFamily = getComputedStyle(document.documentElement).getPropertyValue("--font-jetbrains") || "monospace";
     let raf = 0;
     let frame = 0;
     const draw = () => {
@@ -79,7 +80,7 @@ export default function Minimap() {
         c.lineWidth = 1.5 * dpr;
         c.stroke();
         if (label && !edge) {
-          c.font = `600 ${8 * dpr}px ${getComputedStyle(document.documentElement).getPropertyValue("--font-jetbrains") || "monospace"}`;
+          c.font = `600 ${8 * dpr}px ${monoFamily}`;
           c.fillStyle = PALETTE.cream;
           c.textAlign = "center";
           c.fillText(label, 0, -7 * dpr);

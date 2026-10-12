@@ -23,25 +23,29 @@ export function buildArena(game: Game) {
     const dense = game.tier === "high" ? 1 : game.tier === "medium" ? 0.75 : 0.5;
     const out: Entity[] = [];
     const tmp = { temp: true, group: "rush" } as const;
+    // Runtime spawns respect the tier's instance capacity: a full archetype just gets fewer props.
+    const put = (arch: string, x: number, y: number, z: number, yaw: number, opts: Parameters<typeof d.spawn>[5] = tmp) => {
+      if (d.canSpawn(arch)) out.push(d.spawn(arch, x, y, z, yaw, opts));
+    };
     // Crate pyramids.
     for (let k = 0; k < Math.round(6 * dense); k++) {
       const cx = -12 + (k % 3) * 12 + (r() - 0.5) * 3;
       const cz = -10 + Math.floor(k / 3) * 9 + (r() - 0.5) * 2;
-      for (let l = 0; l < 3; l++) for (let i = 0; i < 3 - l; i++) out.push(d.spawn("tower-block", cx + (i - (2 - l) / 2) * 1.24, 0.3 + l * 0.61, cz, 0, tmp));
+      for (let l = 0; l < 3; l++) for (let i = 0; i < 3 - l; i++) put("tower-block", cx + (i - (2 - l) / 2) * 1.24, 0.3 + l * 0.61, cz, 0, tmp);
     }
     // Brick towers.
     for (let k = 0; k < Math.round(4 * dense); k++) {
       const tx = -13 + k * 8.5;
       const tz = 8 + (r() - 0.5) * 4;
       for (let l = 0; l < 7; l++) {
-        out.push(d.spawn("brick", tx - 0.36, 0.175 + l * 0.354, tz, (l % 2) * Math.PI / 2, { ...tmp, color: BRICK_TONES[(r() * 4) | 0] }));
-        out.push(d.spawn("brick", tx + 0.36, 0.175 + l * 0.354, tz, (l % 2) * Math.PI / 2, { ...tmp, color: BRICK_TONES[(r() * 4) | 0] }));
+        put("brick", tx - 0.36, 0.175 + l * 0.354, tz, (l % 2) * Math.PI / 2, { ...tmp, color: BRICK_TONES[(r() * 4) | 0] });
+        put("brick", tx + 0.36, 0.175 + l * 0.354, tz, (l % 2) * Math.PI / 2, { ...tmp, color: BRICK_TONES[(r() * 4) | 0] });
       }
     }
     // A row of glass.
-    for (let i = 0; i < Math.round(8 * dense); i++) out.push(d.spawn("glass", -12 + i * 1.7, 0.66, -15, 0, tmp));
+    for (let i = 0; i < Math.round(8 * dense); i++) put("glass", -12 + i * 1.7, 0.66, -15, 0, tmp);
     // Barrels in the gaps.
-    for (let i = 0; i < Math.round(10 * dense); i++) out.push(d.spawn("barrel", -14 + r() * 28, 0.53, -4 + r() * 8, r() * 3, tmp));
+    for (let i = 0; i < Math.round(10 * dense); i++) put("barrel", -14 + r() * 28, 0.53, -4 + r() * 8, r() * 3, tmp);
     return out;
   };
 

@@ -89,8 +89,11 @@ export class Input {
     }
     this.keys.add(e.code);
     if (e.repeat) return;
+    // Enter on a focused button or link is that control's own activation, not "start".
+    if (e.code === "Enter" && target?.closest("button, a, [role='button']")) return;
     const action = KEY_ACTIONS[e.code];
-    if (!action || (this.suspended && action !== "pause" && action !== "help" && action !== "interact")) return;
+    // Visit Portfolio (P) works from anywhere, panels and menus included.
+    if (!action || (this.suspended && action !== "pause" && action !== "help" && action !== "interact" && action !== "portfolio")) return;
     if (this.onImmediate?.(action)) return;
     if (this.suspended && action === "interact") {
       // E still closes an open panel.
