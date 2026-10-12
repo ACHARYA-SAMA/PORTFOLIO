@@ -8,7 +8,8 @@ import CommandPalette from "@/components/CommandPalette";
 import Toast from "@/components/Toast";
 import KonamiEgg from "@/components/KonamiEgg";
 import SiteShortcuts from "@/components/shortcuts/SiteShortcuts";
-import { jsonLdHtml, PERSON_JSON_LD, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { PERSON_JSON_LD, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/portfolio" },
@@ -25,7 +26,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
   return (
     <>
       <InlineScript html={LOADER_GATE} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(PERSON_JSON_LD) }} />
+      <JsonLd data={PERSON_JSON_LD} />
       <SmoothScrollProvider>{children}</SmoothScrollProvider>
       <ScrollProgress />
       <PageTransition />

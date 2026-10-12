@@ -352,6 +352,9 @@ function Customize() {
 function PauseMenu() {
   const paused = useUI((st) => st.paused);
   const time = useUI((st) => st.time);
+  const sound = useUI((st) => st.sound);
+  const tier = useUI((st) => st.tier);
+  const manual = useUI((st) => st.tierManual);
   const first = useRef<HTMLButtonElement>(null);
   const [confirm, setConfirm] = useState(false);
   const [replays, setReplays] = useState(true);
@@ -381,6 +384,20 @@ function PauseMenu() {
           <button type="button" className={`label ${s.action}`} onClick={() => command("time")}>
             Time of day: {time}
           </button>
+          <button type="button" className={`label ${s.action}`} onClick={() => command("mute")}>
+            Sound: {sound ? "on" : "off"}
+          </button>
+          <label className={`label ${s.action} ${s.select}`}>
+            Quality:{" "}
+            <select value={manual ? tier : "auto"} onChange={(e) => getGame()?.setQuality(e.target.value as Tier | "auto")}>
+              <option value="auto">Auto ({tier})</option>
+              {(Object.keys(TIERS) as Tier[]).map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             className={`label ${s.action}`}
@@ -426,6 +443,15 @@ function PauseMenu() {
 
 /* ── Touch ──────────────────────────────────────────────── */
 
+/** Keep the finger on its control even when it slides off; harmless if the pointer is already gone. */
+function capture(e: React.PointerEvent) {
+  try {
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  } catch {
+    /* pointer already released */
+  }
+}
+
 function TouchControls() {
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLSpanElement>(null);
@@ -463,7 +489,7 @@ function TouchControls() {
 
   const hold = (key: "boost" | "drift") => ({
     onPointerDown: (e: React.PointerEvent) => {
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      capture(e);
       const g = getGame();
       if (g) g.input.touch[key] = true;
       g?.haptic(12);
@@ -485,7 +511,7 @@ function TouchControls() {
         className={s.stick}
         onPointerDown={(e) => {
           id.current = e.pointerId;
-          (e.target as HTMLElement).setPointerCapture(e.pointerId);
+          capture(e);
           move(e);
         }}
         onPointerMove={(e) => id.current === e.pointerId && move(e)}
@@ -573,7 +599,7 @@ export default function Hud() {
   const closeHelp = useCallback(() => ui.set({ helpOpen: false }), []);
 
   return (
-    <div className={s.hud} data-phase={phase}>
+    <div className={s.hud} data-phase={phase} data-device={device}>
       {phase === "title" ? <TitleScreen /> : null}
       {playing && !photo ? (
         <div className={s.play}>

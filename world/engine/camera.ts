@@ -142,8 +142,14 @@ export class CameraRig {
     const len = _off.length();
     if (len > 0.5 && this.mode !== "top") {
       _off.divideScalar(len);
-      this.ray.origin = { x: _target.x, y: _target.y, z: _target.z };
-      this.ray.dir = { x: _off.x, y: _off.y, z: _off.z };
+      const o = this.ray.origin;
+      o.x = _target.x;
+      o.y = _target.y;
+      o.z = _target.z;
+      const d = this.ray.dir;
+      d.x = _off.x;
+      d.y = _off.y;
+      d.z = _off.z;
       const hit = this.physics.world.castRay(this.ray, len, true, undefined, RAY_GROUPS);
       if (hit) _desired.copy(_target).addScaledVector(_off, Math.max(1.2, hit.timeOfImpact - 0.35));
     }

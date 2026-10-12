@@ -29,7 +29,7 @@ const PRESETS: Record<ParticleKind, Preset> = {
   splinter: { additive: false, hard: true, life: [0.9, 1.4], size: [0.16, 0.1], alpha: [1, 1], gravity: -22, drag: 0.4, colors: [PALETTE.wood, PALETTE.woodDark, "#d29a5f"] },
   chip: { additive: false, hard: true, life: [0.8, 1.2], size: [0.14, 0.1], alpha: [1, 1], gravity: -22, drag: 0.3, colors: [PALETTE.brick, PALETTE.brickDark, PALETTE.concrete] },
   spark: { additive: true, hard: true, life: [0.25, 0.5], size: [0.13, 0.04], alpha: [1, 0.2], gravity: -16, drag: 1.2, colors: ["#fff3c4", "#ffd27a", "#ff9a3c"] },
-  glint: { additive: true, hard: false, life: [0.2, 0.45], size: [0.55, 0.05], alpha: [1, 0], gravity: -3, drag: 2, colors: ["#ffffff", "#dff6ff"] },
+  glint: { additive: true, hard: false, life: [0.15, 0.35], size: [0.26, 0.03], alpha: [0.9, 0], gravity: -3, drag: 2, colors: ["#ffffff", "#dff6ff"] },
   leaf: { additive: false, hard: true, life: [1.4, 2.4], size: [0.2, 0.16], alpha: [1, 1], gravity: -3.2, drag: 2.6, colors: [PALETTE.foliage, PALETTE.foliageDark, "#5b7438"], flutter: 3 },
   paper: { additive: false, hard: true, life: [2, 3.2], size: [0.34, 0.3], alpha: [1, 1], gravity: -1.4, drag: 3, colors: [PALETTE.paper, PALETTE.cream, "#e6dfd3"], flutter: 4 },
   flame: { additive: true, hard: false, life: [0.14, 0.26], size: [0.55, 0.12], alpha: [1, 0], gravity: 1, drag: 4, colors: ["#ffd37a", "#ff7a2a", PALETTE.redHi] },
@@ -159,6 +159,7 @@ export class Particles {
   private cursor = 0;
   private batches: { soft: Batch; hard: Batch; add: Batch; addHard: Batch };
   private kinds: ParticleKind[] = Object.keys(PRESETS) as ParticleKind[];
+  private batchList: Batch[] = [];
   private colorCache = new Map<string, THREE.Color>();
   scale = 1;
   count = 0;
@@ -181,7 +182,8 @@ export class Particles {
       add: new Batch(Math.ceil(capacity / 2), true, false),
       addHard: new Batch(Math.ceil(capacity / 2), true, true),
     };
-    Object.values(this.batches).forEach((b) => this.group.add(b.mesh));
+    this.batchList = Object.values(this.batches);
+    this.batchList.forEach((b) => this.group.add(b.mesh));
   }
 
   private color(hex: string) {
@@ -288,7 +290,7 @@ export class Particles {
     b.add.commit(Math.min(na, b.add.capacity));
     b.addHard.commit(Math.min(nah, b.addHard.capacity));
     if (fog) {
-      for (const batch of Object.values(b)) {
+      for (const batch of this.batchList) {
         (batch.mat.uniforms.uFogColor.value as THREE.Color).copy(fog.color);
         batch.mat.uniforms.uFogNear.value = fog.near;
         batch.mat.uniforms.uFogFar.value = fog.far;

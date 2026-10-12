@@ -48,7 +48,7 @@ export default function WorldEntry() {
     leaving.current = true;
     // The game (if running) pulls its camera up and out; the shutter closes over it.
     window.dispatchEvent(new CustomEvent("aa:world-leave"));
-    requestShutter(PORTFOLIO, gate === "go" && phase !== "loading" ? 260 : 0);
+    requestShutter(PORTFOLIO);
     window.setTimeout(() => (leaving.current = false), 2500);
   }, [gate, phase]);
 

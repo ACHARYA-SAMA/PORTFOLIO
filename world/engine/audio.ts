@@ -180,7 +180,10 @@ export class WorldAudio {
       this.pad.next = time + 12;
       this.setChord(this.pad.chord + 1);
     }
-    this.voices = this.voices.filter((v) => v.stop > t);
+    // Forget finished voices in place (no new array per frame).
+    let kept = 0;
+    for (let i = 0; i < this.voices.length; i++) if (this.voices[i].stop > t) this.voices[kept++] = this.voices[i];
+    this.voices.length = kept;
   }
 
   /** Quieten the engine loops (title screen, panels). */

@@ -8,6 +8,7 @@ import { restoreSoundPreference } from "@/lib/sound";
 import { soundOn } from "@/lib/store";
 import { TIERS, guessTier, type Tier } from "../engine/config";
 import { Game } from "../engine/game";
+import { Post } from "../engine/post";
 import { setGame } from "../engine/instance";
 import { loadRapier, type Rapier } from "../engine/physics";
 import { resetUI, setCommandHandler, ui } from "../engine/store";
@@ -23,8 +24,9 @@ function initialTier(): Tier {
 
 /** Lives inside <Canvas>: owns the Game for the canvas's lifetime. */
 function GameMount({ R, tier }: { R: Rapier; tier: Tier }) {
-  const { gl, scene, camera, setDpr } = useThree();
+  const { gl, scene, camera, setDpr, size, viewport } = useThree();
   const gameRef = useRef<Game | null>(null);
+  const postRef = useRef<Post | null>(null);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -71,6 +73,8 @@ function GameMount({ R, tier }: { R: Rapier; tier: Tier }) {
       setCommandHandler(null);
       setGame(null);
       gameRef.current = null;
+      postRef.current?.dispose();
+      postRef.current = null;
       game.dispose();
       resetUI();
     };
@@ -78,7 +82,26 @@ function GameMount({ R, tier }: { R: Rapier; tier: Tier }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useFrame((_, dt) => gameRef.current?.frame(dt));
+  useEffect(() => {
+    postRef.current?.setSize(size.width, size.height, viewport.dpr);
+  }, [size.width, size.height, viewport.dpr]);
+
+  // Priority 1: this callback owns rendering (bloom on the high tier, plain render otherwise).
+  useFrame((_, dt) => {
+    // Count the whole frame (every post pass), not just the last render call.
+    gl.info.autoReset = false;
+    gl.info.reset();
+    const game = gameRef.current;
+    if (!game) {
+      gl.render(scene, camera);
+      return;
+    }
+    game.frame(dt);
+    if (TIERS[game.tier].bloom) {
+      if (!postRef.current) postRef.current = new Post(gl, scene, camera, size.width, size.height);
+      postRef.current.render(dt, game.car.boosting, game.reduced);
+    } else gl.render(scene, camera);
+  }, 1);
   return null;
 }
 
@@ -89,7 +112,9 @@ export default function WorldApp() {
 
   useEffect(() => {
     let alive = true;
-    ui.set({ tier, loadProgress: 0.05 });
+    // Best first guess at the input device; the first real input corrects it.
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    ui.set({ tier, loadProgress: 0.05, device: coarse ? "touch" : "keyboard" });
     Promise.all([loadRapier(), loadCanvasFonts()])
       .then(([rapier]) => {
         if (!alive) return;

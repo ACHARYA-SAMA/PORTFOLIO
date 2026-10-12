@@ -84,7 +84,7 @@ export type TierConfig = {
 export const TIERS: Record<Tier, TierConfig> = {
   high: { dpr: 1.75, antialias: true, shadows: true, shadowMap: 2048, maxBodies: 300, maxDebris: 2000, particles: 1600, debrisVsDebris: true, glassShards: true, fogFar: 300, bloom: true, ambientLife: 1 },
   medium: { dpr: 1.25, antialias: true, shadows: true, shadowMap: 1024, maxBodies: 160, maxDebris: 1000, particles: 900, debrisVsDebris: false, glassShards: true, fogFar: 240, bloom: false, ambientLife: 0.6 },
-  low: { dpr: 1, antialias: false, shadows: false, shadowMap: 512, maxBodies: 100, maxDebris: 500, particles: 450, debrisVsDebris: false, glassShards: false, fogFar: 190, bloom: false, ambientLife: 0.3 },
+  low: { dpr: 1.3, antialias: false, shadows: false, shadowMap: 512, maxBodies: 100, maxDebris: 500, particles: 450, debrisVsDebris: false, glassShards: false, fogFar: 190, bloom: false, ambientLife: 0.3 },
 };
 
 export const TIER_ORDER: Tier[] = ["low", "medium", "high"];

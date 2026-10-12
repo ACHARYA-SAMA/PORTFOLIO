@@ -8,15 +8,15 @@
 /* Closing: the halves meet in the middle. Opening: they part, as the loader does. */
 .top,
 .bottom {
-  transition: transform 0.42s cubic-bezier(0.7, 0, 0.2, 1);
+  transition: transform 0.32s cubic-bezier(0.7, 0, 0.2, 1);
 }
 
 .shutter[data-phase="closing"] .top {
-  animation: inTop 0.42s cubic-bezier(0.7, 0, 0.2, 1) both;
+  animation: inTop 0.32s cubic-bezier(0.7, 0, 0.2, 1) both;
 }
 
 .shutter[data-phase="closing"] .bottom {
-  animation: inBottom 0.42s cubic-bezier(0.7, 0, 0.2, 1) both;
+  animation: inBottom 0.32s cubic-bezier(0.7, 0, 0.2, 1) both;
 }
 
 .shutter[data-phase="closed"] .top,
@@ -25,11 +25,11 @@
 }
 
 .shutter[data-phase="opening"] .top {
-  animation: outTop 0.52s cubic-bezier(0.87, 0, 0.13, 1) both;
+  animation: outTop 0.42s cubic-bezier(0.87, 0, 0.13, 1) both;
 }
 
 .shutter[data-phase="opening"] .bottom {
-  animation: outBottom 0.52s cubic-bezier(0.87, 0, 0.13, 1) both;
+  animation: outBottom 0.42s cubic-bezier(0.87, 0, 0.13, 1) both;
 }
 
 @keyframes inTop {

@@ -209,7 +209,7 @@ type SkyPreset = { top: string; horizon: string; bottom: string; sun: string; su
 export const SKIES: Record<TimeOfDay, SkyPreset> = {
   day: { top: "#8a170a", horizon: "#ff7d4f", bottom: "#3a120a", sun: "#ffe0bd", sunDir: [-0.55, 0.42, -0.72], sunSize: 1.4, sunI: 3.1, hemiSky: "#ffc2a8", hemiGround: "#5a2a1c", hemiI: 1.55, fog: "#dc6444", stars: 0, lamps: 0.2 },
   dusk: { top: "#2c0812", horizon: "#cf3a4f", bottom: "#1a070b", sun: "#ff936a", sunDir: [-0.7, 0.12, -0.7], sunSize: 2.6, sunI: 1.6, hemiSky: "#d06a7c", hemiGround: "#2a1012", hemiI: 1.0, fog: "#7a2538", stars: 0.35, lamps: 1.2 },
-  night: { top: "#050206", horizon: "#2e0c10", bottom: "#030102", sun: "#9fb0d6", sunDir: [0.4, 0.55, 0.6], sunSize: 0.8, sunI: 0.35, hemiSky: "#4a3550", hemiGround: "#0c0606", hemiI: 0.45, fog: "#170809", stars: 1, lamps: 2.6 },
+  night: { top: "#050206", horizon: "#2e0c10", bottom: "#030102", sun: "#9fb0d6", sunDir: [0.4, 0.55, 0.6], sunSize: 0.8, sunI: 0.35, hemiSky: "#5a4262", hemiGround: "#120909", hemiI: 0.62, fog: "#170809", stars: 1, lamps: 2.6 },
 };
 
 export function buildIsland(physics: Physics, tierShadowMap: number, groundSize: number): Island {

@@ -1,7 +1,8 @@
 import WorldEntry from "@/components/world/WorldEntry";
 import { CONTACT, PERSON, UNMASK } from "@/lib/content";
 import { PORTFOLIO, sectionHref } from "@/lib/routes";
-import { jsonLdHtml, PERSON_JSON_LD, SITE_DESCRIPTION } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { PERSON_JSON_LD, SITE_DESCRIPTION } from "@/lib/site";
 import { ZONES } from "@/lib/zones";
 
 /**
@@ -12,24 +13,12 @@ import { ZONES } from "@/lib/zones";
 export default function Home() {
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(PERSON_JSON_LD) }} />
+      <JsonLd data={PERSON_JSON_LD} />
       <div className="sr-only">
         <h1>
           {PERSON.name} ({PERSON.callsign}): a portfolio you can drive
         </h1>
         <p>{SITE_DESCRIPTION}</p>
-        <p>
-          The same portfolio without the driving is at <a href={PORTFOLIO}>{PORTFOLIO}</a>.
-        </p>
-        <nav aria-label="Portfolio sections">
-          <ul>
-            {ZONES.map((z) => (
-              <li key={z.id}>
-                <a href={sectionHref(z.section)}>{z.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
       </div>
 
       <noscript>
@@ -73,6 +62,22 @@ export default function Home() {
       </noscript>
 
       <WorldEntry />
+
+      {/* Links after the entry in DOM order: the skip link and Visit Portfolio stay the first two tab stops. */}
+      <div className="sr-only">
+        <p>
+          The same portfolio without the driving is at <a href={PORTFOLIO}>{PORTFOLIO}</a>.
+        </p>
+        <nav aria-label="Portfolio sections">
+          <ul>
+            {ZONES.map((z) => (
+              <li key={z.id}>
+                <a href={sectionHref(z.section)}>{z.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </main>
   );
 }

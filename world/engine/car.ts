@@ -42,6 +42,14 @@ const _up = new THREE.Vector3();
 const _fwd = new THREE.Vector3();
 const _right = new THREE.Vector3();
 const Y = new THREE.Vector3(0, 1, 0);
+/** One scratch vector for Rapier calls (it copies the values into WASM, so reuse is safe). */
+const _rv = { x: 0, y: 0, z: 0 };
+const vec = (x: number, y: number, z: number) => {
+  _rv.x = x;
+  _rv.y = y;
+  _rv.z = z;
+  return _rv;
+};
 
 export type CarEvents = {
   onLand?: (airTime: number, distance: number) => void;
@@ -248,7 +256,7 @@ export class Car {
   enableHeadlights(on: boolean, scene: THREE.Object3D) {
     if (on && this.headlights.length === 0) {
       for (const s of [1, -1]) {
-        const l = new THREE.SpotLight(PALETTE.cream, 60, 48, 0.52, 0.55, 1.4);
+        const l = new THREE.SpotLight(PALETTE.cream, 130, 60, 0.55, 0.5, 1.2);
         l.position.set(0.56 * s, 0.2, 1.3);
         l.target.position.set(0.56 * s * 1.6, -1.6, 14);
         this.group.add(l, l.target);
@@ -353,28 +361,28 @@ export class Car {
     body.resetTorques(true);
     if (contacts > 0) {
       // Downforce grows with speed: planted at 100 km/h without feeling heavy at 20.
-      body.addForce({ x: -_up.x * speed * speed * 0.9, y: -_up.y * speed * speed * 0.9, z: -_up.z * speed * speed * 0.9 }, true);
+      body.addForce(vec(-_up.x * speed * speed * 0.9, -_up.y * speed * speed * 0.9, -_up.z * speed * speed * 0.9), true);
       // Drift assist: steering while sliding rotates the car.
       if (handbrake && speed > 5) {
         const k = YAW_INERTIA * steerIn * 2.4 * dt;
-        body.applyTorqueImpulse({ x: _up.x * k, y: _up.y * k, z: _up.z * k }, true);
+        body.applyTorqueImpulse(vec(_up.x * k, _up.y * k, _up.z * k), true);
       }
       // Gentle self-righting so hard corners lean rather than roll.
       _v.crossVectors(_up, Y).multiplyScalar(MASS * 6 * dt);
-      body.applyTorqueImpulse({ x: _v.x, y: 0, z: _v.z }, true);
+      body.applyTorqueImpulse(vec(_v.x, 0, _v.z), true);
     } else {
       // Air control: steer yaws, throttle/brake pitch, and a slow auto-level.
       const kYaw = YAW_INERTIA * steerIn * 1.4 * dt;
       const kPitch = YAW_INERTIA * (throttle - brakeIn) * 0.9 * dt;
-      body.applyTorqueImpulse({ x: _up.x * kYaw + _right.x * -kPitch, y: _up.y * kYaw + _right.y * -kPitch, z: _up.z * kYaw + _right.z * -kPitch }, true);
+      body.applyTorqueImpulse(vec(_up.x * kYaw + _right.x * -kPitch, _up.y * kYaw + _right.y * -kPitch, _up.z * kYaw + _right.z * -kPitch), true);
       _v.crossVectors(_up, Y).multiplyScalar(MASS * 2.5 * dt);
-      body.applyTorqueImpulse({ x: _v.x, y: 0, z: _v.z }, true);
+      body.applyTorqueImpulse(vec(_v.x, 0, _v.z), true);
     }
 
     // Boost also pushes in the air a little.
     if (this.boosting && contacts === 0) {
       const k = MASS * 6 * dt;
-      body.applyImpulse({ x: _fwd.x * k, y: _fwd.y * k, z: _fwd.z * k }, true);
+      body.applyImpulse(vec(_fwd.x * k, _fwd.y * k, _fwd.z * k), true);
     }
 
     c.updateVehicle(dt);

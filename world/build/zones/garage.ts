@@ -297,7 +297,7 @@ function recsys(game: Game) {
   const bx = SHED.x + 10;
   const back = SHED.z - SHED.d / 2 + 0.35;
   const p = project("recsys");
-  sign(ctx, "RECOMMENDATION PIPELINE", bx, SHED.h - 0.6, SHED.z + SHED.d / 2 + 0.27, 0, 8.6, 1.1, { bg: PALETTE.red, fg: PALETTE.cream, font: "display" });
+  sign(ctx, p.title.toUpperCase(), bx, SHED.h - 0.6, SHED.z + SHED.d / 2 + 0.27, 0, 8.6, 1.1, { bg: PALETTE.red, fg: PALETTE.cream, font: "display" });
   sign(ctx, p.tags.join(" · "), bx, 5.6, back, 0, 8, 0.45, { bg: PALETTE.ink, fg: PALETTE.signal, font: "mono", emissive: true });
   block(ctx, 8.6, 4.6, 0.12, bx, 2.9, back - 0.1, "#161616");
   const cols = 5;

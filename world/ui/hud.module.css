@@ -1088,3 +1088,79 @@
     animation: none;
   }
 }
+
+/* ── Touch layout: thumbs at the bottom corners, map under the portfolio pill ── */
+
+.hud[data-device="touch"] .topRight {
+  display: none;
+}
+
+.hud[data-device="touch"] .minimap {
+  left: auto;
+  bottom: auto;
+  right: max(14px, env(safe-area-inset-right));
+  top: calc(max(14px, env(safe-area-inset-top)) + 54px);
+}
+
+.hud[data-device="touch"] .mapCanvas {
+  width: 104px !important;
+  height: 104px !important;
+}
+
+.hud[data-device="touch"] .stick {
+  left: max(20px, env(safe-area-inset-left));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: 132px;
+  height: 132px;
+}
+
+.hud[data-device="touch"] .buttons {
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+}
+
+.hud[data-device="touch"] .prompts {
+  right: 50%;
+  bottom: auto;
+  top: calc(max(14px, env(safe-area-inset-top)) + 4px);
+  transform: translateX(50%);
+  align-items: center;
+}
+
+.hud[data-device="touch"] .hint {
+  bottom: auto;
+  top: 34%;
+}
+
+.hud[data-device="touch"] .toasts {
+  bottom: auto;
+  top: 18%;
+}
+
+.hud[data-device="touch"] .speedDrums {
+  --h: 22px;
+}
+
+.hud[data-device="touch"] .scoreDrums {
+  --h: 13px;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .hud[data-device="touch"] .topLeft {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .hud[data-device="touch"] .meterKey {
+    display: none;
+  }
+  .hud[data-device="touch"] .banner {
+    top: 14%;
+  }
+  .hud[data-device="touch"] .bannerText {
+    font-size: 30px;
+  }
+}
+
+.menuCol .select select {
+  color: inherit;
+}

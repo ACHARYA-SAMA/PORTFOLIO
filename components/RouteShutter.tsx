@@ -14,8 +14,8 @@ import s from "./routeShutter.module.css";
  */
 
 const EVENT = "aa:shutter";
-const CLOSE_MS = 420;
-const OPEN_MS = 520;
+const CLOSE_MS = 320;
+const OPEN_MS = 420;
 
 export function requestShutter(href: string, delayMs = 0) {
   window.dispatchEvent(new CustomEvent(EVENT, { detail: { href, delayMs } }));
@@ -41,13 +41,15 @@ export default function RouteShutter() {
         later(() => router.push(href), 160);
         return;
       }
-      later(() => {
+      const close = () => {
         setPhase("closing");
         later(() => {
           setPhase("closed");
           router.push(href);
         }, CLOSE_MS);
-      }, delayMs);
+      };
+      if (delayMs > 0) later(close, delayMs);
+      else close();
     };
     window.addEventListener(EVENT, onRequest);
     return () => {

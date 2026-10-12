@@ -87,6 +87,8 @@ export class Game {
   private photoRequested = false;
   private frameTimes: number[] = [];
   private tierCheckAt = 4;
+  private downgrades = 0;
+  private lastDowngrade = -999;
   private introAt = 0;
   private hintTimer = 0;
   private wasPanel = false;
@@ -191,6 +193,7 @@ export class Game {
     this.applyTime(this.prefs.time, false);
     this.applyTier(this.tier, false);
 
+    this.input.device = ui.get().device;
     this.input.attach();
     this.input.onImmediate = (action) => {
       if (action !== "interact" || ui.get().panel || !this.context) return false;
@@ -294,11 +297,26 @@ export class Game {
   /** Last few break events (debug overlay and QA). */
   readonly breakLog: string[] = [];
 
+  private knockSoundAt = 0;
+
   private onBreak(info: BreakInfo) {
     this.breakLog.push(`${this.time.toFixed(2)} ${info.entity.arch.id} ${info.kind} ${Math.round(info.force)}N${info.byCar ? " car" : ""}`);
     if (this.breakLog.length > 30) this.breakLog.shift();
     const m = MATERIALS[info.material];
     const intensity = Math.min(1, info.force / (info.entity.arch.threshold * 3));
+    if (info.kind === "knock") {
+      // A brick out of a wall: a small score, the combo carries on, sounds thinned out.
+      if (this.time > this.knockSoundAt) {
+        this.knockSoundAt = this.time + 0.07;
+        this.audio.breakSound(info.material, 0.25);
+      }
+      if (this.time - this.lastBreak < COMBO_WINDOW) this.combo = Math.min(COMBO_MAX, this.combo + (Math.random() < 0.34 ? 1 : 0));
+      else this.combo = 1;
+      this.lastBreak = this.time;
+      this.addScore(Math.round(m.score * 0.4 * Math.max(1, this.combo)));
+      ui.set({ combo: this.combo });
+      return;
+    }
     this.audio.breakSound(info.material, intensity);
     if (info.kind !== "topple") {
       this.bumpStat("destroyed");
@@ -488,8 +506,9 @@ export class Game {
     }
     // Plates: the drum text, or the speed while boosting (km/h on the drums).
     if (this.time > this.plateHold) {
-      const want = car.boosting ? `${Math.round(Math.abs(car.speed) * 3.6)} KMH` : this.plateText;
-      if (want !== this.plateShowing && (!car.boosting || Math.floor(this.time * 4) !== Math.floor((this.time - dt) * 4))) {
+      const want = car.boosting ? `${Math.round((Math.abs(car.speed) * 3.6) / 5) * 5} KMH` : this.plateText;
+      // While boosting, re-read the speed about once a second so the drums land between reads.
+      if (want !== this.plateShowing && (!car.boosting || Math.floor(this.time * 1.2) !== Math.floor((this.time - dt) * 1.2) || !this.plateShowing.endsWith("KMH"))) {
         this.plateShowing = want;
         car.plates.roll(want, this.time, car.boosting ? 0.02 : 0.05);
       }
@@ -583,8 +602,13 @@ export class Game {
     for (const z of this.zones) {
       const dx = p.x - z.layout.pad.x;
       const dz = p.z - z.layout.pad.z;
-      const inside = dx * dx + dz * dz < z.layout.pad.r * z.layout.pad.r;
+      const d2 = dx * dx + dz * dz;
+      const inside = d2 < z.layout.pad.r * z.layout.pad.r;
       z.pad.setActive(inside);
+      // Up close the label would sit in the windscreen: it rises and shrinks away.
+      const near = THREE.MathUtils.clamp((Math.sqrt(d2) - 6) / 10, 0, 1);
+      z.label.position.y = 4.2 + (1 - near) * 3;
+      z.label.scale.setScalar(0.55 + near * 0.45);
       if (inside) on = z.layout.id;
     }
     if (dist2(p.x, p.z, REBUILD_PAD.x, REBUILD_PAD.z) < REBUILD_PAD.r ** 2) on = "rebuild";
@@ -765,7 +789,12 @@ export class Game {
     this.car.place(z.pad.x - Math.sin(yaw) * 2, 1.2, z.pad.z - Math.cos(yaw) * 2, yaw);
     this.rig.snapBehind(this.car);
     this.padOn = id;
-    if (ui.get().phase !== "play") ui.set({ phase: "play" });
+    if (ui.get().phase !== "play") {
+      // Explore from the title: skip the drive-out, but the garage still opens.
+      this.audio.ensure();
+      this.zones.find((z) => z.layout.id === "pit")?.hooks.onStart?.();
+      ui.set({ phase: "play" });
+    }
     ui.set({ zoneMenuOpen: false, paused: false });
     this.openPanel(id);
   }
@@ -806,6 +835,7 @@ export class Game {
 
   /** Quality tier: render scale, shadows, particles, destruction caps, view distance. */
   applyTier(t: Tier, announce: boolean) {
+    const shadowsBefore = this.gl.shadowMap.enabled;
     this.tier = t;
     const cfg = TIERS[t];
     this.setDpr(Math.min(window.devicePixelRatio || 1, cfg.dpr));
@@ -816,12 +846,15 @@ export class Game {
     this.island.fog.far = cfg.fogFar;
     this.camera.far = cfg.fogFar + 40;
     this.camera.updateProjectionMatrix();
-    this.scene.traverse((o) => {
-      if (o instanceof THREE.Mesh) {
-        const mats = Array.isArray(o.material) ? o.material : [o.material];
-        mats.forEach((m) => (m.needsUpdate = true));
-      }
-    });
+    // Shadow on/off changes every lit shader; anything else needs no recompile.
+    if (shadowsBefore !== cfg.shadows) {
+      this.scene.traverse((o) => {
+        if (o instanceof THREE.Mesh) {
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          mats.forEach((m) => (m.needsUpdate = true));
+        }
+      });
+    }
     ui.set({ tier: t });
     if (announce) pushToast({ kind: "info", title: `Quality: ${t}` }, 1400);
   }
@@ -841,12 +874,18 @@ export class Game {
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
     telemetry.frameMs = avg;
     telemetry.fps = avg > 0 ? 1000 / avg : 0;
-    if (this.prefs.quality !== "auto" || ui.get().phase === "loading" || this.time < this.tierCheckAt || document.hidden) return;
+    if (this.prefs.quality !== "auto" || ui.get().phase === "loading" || this.time < this.tierCheckAt || document.hidden || this.frameTimes.length < 60) return;
     this.tierCheckAt = this.time + 2.5;
     const i = TIER_ORDER.indexOf(this.tier);
-    if (avg > 24 && i > 0) this.applyTier(TIER_ORDER[i - 1], true);
-    else if (avg < 11.5 && i < TIER_ORDER.length - 1 && this.time > 20) {
+    if (avg > 24 && i > 0) {
+      this.downgrades++;
+      this.lastDowngrade = this.time;
+      this.frameTimes.length = 0;
+      this.applyTier(TIER_ORDER[i - 1], true);
+    } else if (avg < 11.5 && i < TIER_ORDER.length - 1 && this.time > 20 && this.downgrades < 2 && this.time - this.lastDowngrade > 45) {
+      // Hysteresis: step up rarely, never straight after stepping down, and not at all after two step-downs.
       this.tierCheckAt = this.time + 12;
+      this.frameTimes.length = 0;
       this.applyTier(TIER_ORDER[i + 1], false);
     }
   }
@@ -948,10 +987,9 @@ export class Game {
     this.root.traverse((o) => {
       if (o instanceof THREE.Mesh || o instanceof THREE.Points) {
         o.geometry.dispose();
+        // Every material, cached or not (dispose is safe to repeat).
         const mats = Array.isArray(o.material) ? o.material : [o.material];
-        mats.forEach((m) => {
-          if (m instanceof THREE.ShaderMaterial) m.dispose();
-        });
+        mats.forEach((m) => m.dispose());
       }
     });
     disposeMaterials();

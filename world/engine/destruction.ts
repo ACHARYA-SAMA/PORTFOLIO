@@ -80,6 +80,8 @@ export type Entity = {
   broken: boolean;
   hidden: boolean;
   toppled: boolean;
+  /** Sent flying whole (a brick out of a wall): scores once, no fracture. */
+  knocked: boolean;
   anchored: boolean;
   homePos: THREE.Vector3;
   homeQuat: THREE.Quaternion;
@@ -107,7 +109,7 @@ export type BreakInfo = {
   byCar: boolean;
   pieces: number;
   volume: number;
-  kind: "break" | "disintegrate" | "vanish" | "topple";
+  kind: "break" | "disintegrate" | "vanish" | "topple" | "knock";
 };
 
 export type SpawnOpts = {
@@ -211,12 +213,14 @@ class DebrisPool {
   }
 
   /** Oldest live chunk (optionally only ones holding a body). */
-  oldest(withBody: boolean) {
+  /** Oldest live chunk; optionally only ones holding a body, or only ones whose body sleeps. */
+  oldest(withBody: boolean, sleeping = false) {
     let best = -1;
     let bestT = Infinity;
     for (let i = 0; i < this.highWater; i++) {
       if (!this.active[i] || this.fade[i] > 0) continue;
       if (withBody && !this.bodies[i]) continue;
+      if (sleeping && !this.bodies[i]?.isSleeping()) continue;
       if (this.born[i] < bestT) {
         bestT = this.born[i];
         best = i;
@@ -236,9 +240,12 @@ export class Destruction {
   readonly group = new THREE.Group();
   readonly entities: Entity[] = [];
   private archetypes = new Map<string, Archetype>();
+  /** Instanced meshes of every archetype, for per-frame updates without iterators. */
+  private instanced: THREE.InstancedMesh[] = [];
   private byCollider = new Map<number, number>();
   private byBody = new Map<number, number>(); // >=0 entity id, <0 chunk (-(i+1)), pool encoded in high bit
   private queue: Array<{ e: Entity; force: number; byCar: boolean; from: THREE.Vector3 }> = [];
+  private knocks: Array<{ e: Entity; force: number; byCar: boolean }> = [];
   private opaque: DebrisPool;
   private glass: DebrisPool;
   private stepId = 0;
@@ -309,6 +316,7 @@ export class Destruction {
       mesh.frustumCulled = false;
       for (let i = 0; i < def.capacity; i++) mesh.setMatrixAt(i, HIDE);
       this.group.add(mesh);
+      this.instanced.push(mesh);
     }
     const arch: Archetype = {
       ...def,
@@ -380,6 +388,7 @@ export class Destruction {
       broken: false,
       hidden: false,
       toppled: false,
+      knocked: false,
       anchored: !!arch.anchored,
       homePos: new THREE.Vector3(x, y, z),
       homeQuat: _q.clone(),
@@ -457,6 +466,9 @@ export class Destruction {
         if (force > e.arch.threshold) {
           this.queueBreak(e, force, byCar, other);
           hit = e;
+        } else if (!e.knocked && !e.anchored && force > e.arch.threshold * 0.22) {
+          e.knocked = true;
+          this.knocks.push({ e, force, byCar });
         }
       } else if (!e.toppled && force > e.arch.threshold) {
         // Metal: first real knock counts as a topple (clang, sparks, score).
@@ -485,6 +497,16 @@ export class Destruction {
     const q = this.queue;
     this.queue = [];
     for (const item of q) this.breakEntity(item.e, item.force, item.byCar, item.from);
+    if (this.knocks.length) {
+      for (const k of this.knocks) {
+        if (k.e.broken) continue;
+        const p = k.e.currPos;
+        this.particles.emit("dust", p.x, p.y, p.z, 2, 1.2, 0, 0.4, 0, 0.6);
+        const info: BreakInfo = { entity: k.e, material: k.e.arch.material, force: k.force, pos: p.clone(), byCar: k.byCar, pieces: 0, volume: k.e.arch.size[0] * k.e.arch.size[1] * k.e.arch.size[2], kind: "knock" };
+        this.events.onBreak(info);
+      }
+      this.knocks.length = 0;
+    }
   }
 
   /** Break something on purpose (Dojo reset, tests). */
@@ -599,17 +621,24 @@ export class Destruction {
   private takeBody(): RAPIER.RigidBody | null {
     const { R, world } = this.physics;
     if (this.bodyCount >= this.tier.maxBodies) {
-      // Budget full: the oldest chunk gives up its body (asleep: it stays as a visual; moving: it fades out).
-      const pool = this.opaque.count > 0 ? this.opaque : this.glass;
-      let i = pool.oldest(true);
-      let p = pool;
+      // Budget full. First choice: the oldest resting chunk gives up its body and stays on the ground as
+      // a static piece. Only if nothing rests does the oldest moving chunk lose its body and fade out.
+      let p = this.opaque;
+      let i = this.opaque.oldest(true, true);
       if (i < 0) {
-        p = pool === this.opaque ? this.glass : this.opaque;
-        i = p.oldest(true);
+        p = this.glass;
+        i = this.glass.oldest(true, true);
       }
-      if (i < 0) return null;
-      const b = p.bodies[i];
-      if (b && !b.isSleeping()) p.fade[i] = 0.3;
+      if (i < 0) {
+        p = this.opaque.count > 0 ? this.opaque : this.glass;
+        i = p.oldest(true);
+        if (i < 0) {
+          p = p === this.opaque ? this.glass : this.opaque;
+          i = p.oldest(true);
+        }
+        if (i < 0) return null;
+        p.fade[i] = 0.3;
+      }
       this.stripBody(p, i);
     }
     let body = this.freeBodies.pop();
@@ -775,7 +804,7 @@ export class Destruction {
       }
     }
     this.activeEntities.length = w;
-    for (const a of this.archetypes.values()) if (a.mesh) a.mesh.instanceMatrix.needsUpdate = true;
+    for (const m of this.instanced) m.instanceMatrix.needsUpdate = true;
 
     this.recentBreaks = Math.max(0, this.recentBreaks - dt * 12);
     this.renderPool(this.opaque, alpha, dt, step);
@@ -899,7 +928,7 @@ export class Destruction {
       _q.slerpQuaternions(d.fromQ, d.e.homeQuat, e);
       this.writeEntity(d.e, _p, _q);
     }
-    for (const a of this.archetypes.values()) if (a.mesh) a.mesh.instanceMatrix.needsUpdate = true;
+    for (const m of this.instanced) m.instanceMatrix.needsUpdate = true;
     if (rb.t >= 1) this.finishRebuild();
   }
 
@@ -972,6 +1001,7 @@ export class Destruction {
     e.broken = false;
     e.hidden = false;
     e.toppled = false;
+    e.knocked = false;
     e.prevPos.copy(e.homePos);
     e.currPos.copy(e.homePos);
     e.prevQuat.copy(e.homeQuat);
